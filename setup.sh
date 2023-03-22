@@ -5,3 +5,6 @@
 # YOU SHOULD EDIT THESE BEFORE RUNNING ANYTHING
 export OSM_USR='yourusername'
 export OSM_PWD='yourpassword'
+
+# Activate the conda environment
+conda activate ChargingNetwork
