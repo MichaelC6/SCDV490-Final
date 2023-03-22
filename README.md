@@ -16,6 +16,8 @@ You will need to make an account on OpenStreetPath by navigating to
 the above link and clicking `Sign Up` in the top right corner. Then, edit
 the file setup.sh so that it is exporting your username and password
 rather than the sample username and password we give in there.
+We will primarily be using the `osm-python-tools` which is located at the following
+github link [https://github.com/mocnik-science/osm-python-tools](https://github.com/mocnik-science/osm-python-tools).
 
 ## Environment Setup
 
