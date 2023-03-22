@@ -1,0 +1,14 @@
+name: ChargingNetwork
+channels:
+   - defaults
+dependencies:
+   # Core requirements
+   - python=3.8
+   - pip
+   # Other packages
+   - pandas
+   - numpy
+   - scipy
+   - matplotlib
+   - tensorflow
+   - seaborn
