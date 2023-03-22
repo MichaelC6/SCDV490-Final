@@ -5,6 +5,7 @@ dependencies:
    # Core requirements
    - python=3.8
    - pip
+   - ipython
    # Other packages
    - pandas
    - numpy
