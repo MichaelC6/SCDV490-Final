@@ -12,3 +12,5 @@ dependencies:
    - matplotlib
    - tensorflow
    - seaborn
+   - pip:
+     - OSMPythonTools
