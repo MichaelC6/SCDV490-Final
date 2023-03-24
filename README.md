@@ -12,12 +12,8 @@ of electric car chargers throughout the US road network.
 For this project we used the open source map data available on the website
 OpenStreetPath. The link to the OpenStreetPath website is
 [https://www.openstreetmap.org/#map=8/39.330/-93.439](https://www.openstreetmap.org/#map=8/39.330/-93.439).
-You will need to make an account on OpenStreetPath by navigating to
-the above link and clicking `Sign Up` in the top right corner. Then, edit
-the file setup.sh so that it is exporting your username and password
-rather than the sample username and password we give in there.
-We will primarily be using the `osm-python-tools` which is located at the following
-github link [https://github.com/mocnik-science/osm-python-tools](https://github.com/mocnik-science/osm-python-tools).
+We will primarily be using the `overpy` library which is located at the following
+doc link [https://python-overpy.readthedocs.io/en/latest/introduction.html](https://python-overpy.readthedocs.io/en/latest/introduction.html).
 
 ## Environment Setup
 
