@@ -1,3 +1,4 @@
 sampleData/*
 cache/*
 logs/*
+*.xml
