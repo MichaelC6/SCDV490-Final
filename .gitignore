@@ -2,3 +2,5 @@ sampleData/*
 cache/*
 logs/*
 *.xml
+*.ipynb_checkpoints
+*__pycache__*
