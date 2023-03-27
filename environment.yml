@@ -17,3 +17,6 @@ dependencies:
    - pip:
      - overpy
      - lxml
+     - plotly==5.13.1
+     - nbformat
+     - kaleido
