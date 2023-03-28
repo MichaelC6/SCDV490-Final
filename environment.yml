@@ -20,3 +20,4 @@ dependencies:
      - plotly==5.13.1
      - nbformat
      - kaleido
+     - geopy
