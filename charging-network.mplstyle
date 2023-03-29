@@ -1,0 +1,59 @@
+### MATPLOTLIB FORMATTING FOR CHARGING NETWORK PROJECT
+### SEE: https://matplotlib.org/stable/tutorials/introductory/customizing.html
+### FOR MORE INFO
+
+### FIGURE
+figure.facecolor: white
+figure.dpi: 200
+figure.titlesize: 22
+figure.titleweight: bold
+
+### LINES
+lines.linewidth: 1.5
+
+### PATCHES
+patch.facecolor: 0072B2
+
+### LEGEND
+legend.fontsize: 12
+
+### TICKS
+xtick.top: True
+xtick.bottom: True
+xtick.direction: in
+xtick.major.size: 4
+xtick.minor.size: 2
+
+ytick.left: True
+ytick.right: True
+ytick.direction: in
+ytick.major.size: 4
+ytick.minor.size: 2
+
+### FONTS
+font.family: sans-serif
+##font.sans-serif: 'sans-serif'
+font.weight: bold
+font.size: 18
+
+### AXES
+axes.grid: False
+axes.facecolor: white
+axes.linewidth: 1.0
+axes.titlesize: 12
+axes.titleweight: bold
+axes.labelsize: 12
+axes.labelweight: bold
+axes.spines.top: True
+axes.spines.right: True
+axes.grid.which: both
+
+### COLORS SHOULD BE MEDIUM CONTRAST FOR COLORBLIND PEOPLE
+### SEE https://personal.sron.nl/~pault/
+axes.prop_cycle: cycler('color', ['EECC66', 'EE99AA', '6699CC', '997700', '994455', '004488'])
+
+### SAVING FIGURES
+savefig.bbox: tight
+savefig.transparent: False
+savefig.format: png
+savefig.dpi: 250

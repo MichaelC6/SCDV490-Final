@@ -7,9 +7,9 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
-
-sns.set_theme(context='talk', style='white', palette='Set1')
+#import seaborn as sns
+#sns.set_theme(context='talk', style='white', palette='Set1')
+plt.style.use(os.path.join(os.getcwd(), 'charging-network.mplstyle'))
 
 # read in and clean the data
 # this data is from https://afdc.energy.gov/data/10963
@@ -19,8 +19,6 @@ ranges = pd.read_csv(filepath, skiprows=2)
 
 ranges = ranges.dropna(how='all', axis=1)
 ranges = ranges.dropna(how='all', axis=0)
-
-
 
 # let's histogram all the ranges and add vertical lines at the quartiles
 fig, ax = plt.subplots()
