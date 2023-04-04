@@ -16,7 +16,7 @@ outfile = os.path.join(os.getcwd(),'sampleData/test2.xml')
 
 if not os.path.isfile(outfile):
     # download the data using wget in a subprocess
-    url=f"http://overpass-api.de/api/interpreter?data=(node({llLat},{llLon},{urLat},{urLon});<;rel(br););out meta;"
+    url=f"http://overpass-api.de/api/interpreter?data=(node({llLat},{llLon},{urLat},{urLon});<;rel(br);); meta;"
     cmd = f'wget -O {outfile} "{url}"'
     run(cmd, shell=True)
 else:
