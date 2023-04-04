@@ -3,6 +3,7 @@
 import pandas as pd
 import xml.etree.ElementTree as ET
 import overpy
+import os
 
 # This takes in the file path of data and return a dataframe.
 def getDataFrame(path):
@@ -24,4 +25,13 @@ def readXML(filepath):
     result = result.from_xml(et.getroot(), parser=1)
 
     return result
+
+
+def parseXML(path):
+    tree = ET.parse(path)
+    root = tree.getroot()
+    children = []
+    for child in root:
+        children.append([child.tag, child.attrib])
+    return children
     
