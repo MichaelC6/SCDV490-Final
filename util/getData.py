@@ -16,8 +16,10 @@ outfile = os.path.join(os.getcwd(),'sampleData/test2.xml')
 
 if not os.path.isfile(outfile):
     # download the data using wget in a subprocess
-    url=f"http://overpass-api.de/api/interpreter?data=(node({llLat},{llLon},{urLat},{urLon});<;rel(br);); meta;"
+    #url=f"http://overpass-api.de/api/interpreter?data=(node({llLat},{llLon},{urLat},{urLon});<;rel(br);); meta;"
+    url = f'https://api.openstreetmap.org/api/0.6/map?bbox={llLat},{llLon},{urLat},{urLon}'
     cmd = f'wget -O {outfile} "{url}"'
+    print(cmd)
     run(cmd, shell=True)
 else:
     print('Output XML file already exists, skipping...')

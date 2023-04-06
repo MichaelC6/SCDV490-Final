@@ -4,6 +4,7 @@ import pandas as pd
 import overpy
 import os
 from util.xmlTools import *
+import time
 
 # This takes in the file path of data and return a dataframe.
 def getDataFrame(path):
@@ -29,12 +30,15 @@ def readXML_Old(filepath):
 
 #This reads in the XML, it accepts path and returns a dataframe
 def readXML(path):
+    startTime = time.time()
     #Opens the file from the path
     file = open(path, 'r').readlines()[5:-2]
+    print("Path has been read.")
 
     #Creates the dataframe
     columns = ['type','id','lat','long','tags']
     df = pd.DataFrame(data=None, columns=columns)
+    print("DataFrame has been created")
 
     #To avoid being above n time complexity, have to be a bit creative here.
     index = 0
@@ -72,6 +76,16 @@ def readXML(path):
             df.loc[len(df)] = data
         else:
             index += 1
+        if index % 75000 == 0:
+            print(f"The index is currently {index} out of {len(file)}")
+
+    #Checking time of running
+    endTime = time.time()
+    totalTime = endTime - startTime
+    mins = totalTime // 60
+    seconds = totalTime - (60 * mins)
+    print(f"Time it took to run: {mins} minutes and {seconds} seconds")
+    
     return df
 
     
