@@ -71,7 +71,7 @@ def readXML(path, mp=1):
     seconds = totalTime - (60 * mins)
     print(f"Time it took to run: {mins} minutes and {seconds} seconds")
 
-    return ret.reset_index()
+    return ret.reset_index(drop=True)
         
 def readXMLChunk(file):
 

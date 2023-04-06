@@ -4,6 +4,7 @@ Class to hold software for the search algorithm. First attempt is DFS
 from util.preProcessing import readXML
 from util.mapFunctions import geodesicDist
 import numpy as np
+import pandas as pd
 from copy import deepcopy
 
 class Search():
@@ -38,12 +39,13 @@ class Search():
         
         
 
-    def search(self, start=None, d=83.5):
+    def search(self, start=None, d=83.5, tol=1):
         '''
         Performs a search of nodes to find ideal locations of EV chargers
 
         start (tuple) : tuple in the form (latitude, longitude), default is random start
-        d (float) : distance between EV chargers, default is 83.5
+        d (float) : distance miles between EV chargers, default is 83.5
+        tol (float) : distance in miles of tolerance on d, default is 1 
 
         return : DataFrame of ideal EV charger locations
         '''
@@ -60,16 +62,27 @@ class Search():
 
         idx = startIdx
         locs = deepcopy(self.data)
-        print(curr, locs)
+        
         while True:
-            print(idx)
-            self.goodLocs.append(locs.iloc[idx])
+            #print(type(curr.to_frame()), curr.to_frame())
+            self.goodLocs.append(curr.to_frame().T)
 
             # remove row from input dataframe to prevent loops
-            locs = locs.drop(index=idx)
-            #print(curr, locs)
+            locs = locs.drop(index=idx).reset_index(drop=True)
+            
             # calculate the distances
-            dist = geodesicDist(curr.lat, curr.long, locs.lat, locs.long)
-            print(dist)
-            break
-        
+            dist = np.array(geodesicDist(curr.lat, curr.long, locs.lat, locs.long))
+
+            # find indexes that are close
+            sep = np.abs(dist-d)
+            m = np.min(sep)
+            idx = np.where(m == sep)[0][0]
+            #print(m, idx)
+            if sep[idx] < tol:
+                curr = locs.iloc[idx]
+            else:
+                print(f'Minimum seperation found: {m} miles')
+                print(f'No nodes found within {d} miles so search is done!')
+                break
+
+        self.goodLocs = pd.concat(self.goodLocs)
