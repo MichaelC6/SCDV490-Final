@@ -8,7 +8,7 @@ def main():
 
     s = Search('sampleData/test2.xml')
 
-    print(s.data)
+    s.search()
 
 if __name__ == '__main__':
     main()

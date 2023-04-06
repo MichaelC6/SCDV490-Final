@@ -1,11 +1,11 @@
 '''
 Functions for analyzing the map data once it is parsed
 '''
-from geopy.distance import geodesic
+import numpy as np
 
-def dist(lat1, lon1, lat2, lon2, measure='miles'):
+def geodesicDist(lat1, lon1, lat2, lon2):
     '''
-    Wrapper function for the geopy geodesic distance calculation
+    calculates the geodesic distance
     
     lat1 [float] : first coordinate latitude
     lon1 [float] : first coordinate longitude
@@ -14,7 +14,9 @@ def dist(lat1, lon1, lat2, lon2, measure='miles'):
 
     Returns the distance between the two coordinates in miles
     '''
-    coord1 = (lat1, lon1)
-    coord2 = (lat2, lon2)
-    d = geodesic(coord1, coord2)
-    return d.miles
+
+    # formula from: http://edwilliams.org/avform147.htm#Intro
+    # d=acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon1-lon2))
+
+    d = np.arccos(np.sin(lat1)*np.sin(lat2) + np.cos(lat1)*np.cos(lat2)*np.cos(lon1-lon2))
+    return d
