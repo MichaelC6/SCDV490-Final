@@ -13,7 +13,7 @@ class Search():
         self.filepath = filepath
 
         # read in the file with our XML parsing code
-        self.data = readXML(self.filepath)
+        self.data = readXML(self.filepath, mp=8)
 
         
         

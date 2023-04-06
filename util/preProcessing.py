@@ -1,6 +1,7 @@
 #These are functions associated with preprocessing data.
 
 import pandas as pd
+import numpy as np
 import overpy
 import os
 from util.xmlTools import *
@@ -29,21 +30,61 @@ def readXML_Old(filepath):
 
 
 #This reads in the XML, it accepts path and returns a dataframe
-def readXML(path):
+def readXML(path, mp=1):
+    '''
+    This reads the input path and then uses multiprocessing to read in chunks
+    '''
     startTime = time.time()
     #Opens the file from the path
-    file = open(path, 'r').readlines()[5:-2]
+    file = np.array(open(path, 'r').readlines()[5:-2])
     print("Path has been read.")
+
+    if mp == 1:
+        ret = readXMLChunk(file)
+    else:
+        from multiprocessing import Pool
+        # split the files
+        splitFile = np.array_split(file, mp)
+
+        # make sure we aren't missing any tags
+        files = [list(splitFile[0])]
+        for i,f in enumerate(splitFile[1:],1):
+            n = 0
+            for line in reversed(f):
+                if getType(line) == 'tag':
+                    files[i-1].append(line)
+                    n -= 1
+                else:
+                    files.append(list(f[:n]))
+                    break
+
+        # read the chunks in with multiprocessing
+        with Pool(mp) as p:
+            out = p.map(readXMLChunk, files) 
+        
+        ret =  pd.concat(out)
+
+    #Checking time of running
+    endTime = time.time()
+    totalTime = endTime - startTime
+    mins = totalTime // 60
+    seconds = totalTime - (60 * mins)
+    print(f"Time it took to run: {mins} minutes and {seconds} seconds")
+
+    print(ret)
+    return ret
+        
+def readXMLChunk(file):
 
     #Creates the dataframe
     columns = ['type','id','lat','long','tags']
     df = pd.DataFrame(data=None, columns=columns)
     print("DataFrame has been created")
-
+    
     #To avoid being above n time complexity, have to be a bit creative here.
     index = 0
     nNodes = 0
-    while index < len(file):
+    while index < len(file)-1:
         #print(f"CURRENT INDEX: {index}")
         #Starts by getting the current line
         line = file[index]
@@ -79,13 +120,6 @@ def readXML(path):
         if index % 75000 == 0:
             print(f"The index is currently {index} out of {len(file)}")
 
-    #Checking time of running
-    endTime = time.time()
-    totalTime = endTime - startTime
-    mins = totalTime // 60
-    seconds = totalTime - (60 * mins)
-    print(f"Time it took to run: {mins} minutes and {seconds} seconds")
-    
     return df
 
     
