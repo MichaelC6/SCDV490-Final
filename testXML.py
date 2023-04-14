@@ -1,25 +1,32 @@
-from util.preProcessing import readXML
+from util.preProcessing import readXML,readXMLAsList,readXMLAsDict
 import os
 import pandas as pd
 
 dir = os.getcwd()
 
-testFile = os.path.join(dir,'sampleData','test2.xml')
+file = 'test.xml'
+
+testFile = os.path.join(dir,'sampleData',file)
 
 
-print()
-print()
-print("We are running with 1 multiprocessor!")
+# print()
+# print()
+# print("We are running old version")
 
-df = readXML(testFile, 1)
+# #df = readXML(testFile, 1)
 
-print("This has finished running!")
+# print(df.head())
+# print("This has finished running!")
+# print()
+# print()
+print(f"FILE: {file}")
 print()
-print()
-print()
-print()
-print("We are running with 12 multiprocessors!")
+print("We are running Dictionary version")
 
-df = readXML(testFile, 10)
+
+df3 = readXMLAsDict(testFile)
+
+print(df3.head())
+#print(dict[0])
 
 print("This has finished running!")

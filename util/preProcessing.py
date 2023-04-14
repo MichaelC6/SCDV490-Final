@@ -30,7 +30,7 @@ def readXML_Old(filepath):
 
 
 #This reads in the XML, it accepts path and returns a dataframe
-def readXML(path, mp=1):
+def readXMLOLDMP(path, mp=1):
     '''
     This reads the input path and then uses multiprocessing to read in chunks
     '''
@@ -74,7 +74,6 @@ def readXML(path, mp=1):
     return ret.reset_index(drop=True)
         
 def readXMLChunk(file):
-
     #Creates the dataframe
     columns = ['type','id','lat','long','tags']
     df = pd.DataFrame(data=None, columns=columns)
@@ -118,7 +117,68 @@ def readXMLChunk(file):
             index += 1
         if index % 75000 == 0:
             print(f"The index is currently {index} out of {len(file)}")
+    
 
+    return df
+
+
+def readXML(path):
+    startTime = time.time()
+    #Opens the file from the path
+    file = open(path, 'r').readlines()[5:-2]
+    print("Path has been read.")
+
+    #Creates the dataframe
+    columns = ['type','id','lat','long','tags']
+    #df = pd.DataFrame(data=None, columns=columns)
+    df = {}
+    print("DataFrame has been created")
+
+    #To avoid being above n time complexity, have to be a bit creative here.
+    index = 0
+    nNodes = 0
+    while index < len(file):
+        #print(f"CURRENT INDEX: {index}")
+        #Starts by getting the current line
+        line = file[index]
+        #Then it gets the type of the current line
+        type = getType(line)
+        #print(f"THE TYPE: {type}")
+        #If the type is a node, it gets all the info it needs
+        if type == 'node':
+            nNodes += 1
+            id, lat, long = readNode(line)
+        #Then if the next row is a tag
+            if getType(file[index+1]) == 'tag':
+                #print("IN A TAG!")
+                #Go to the next row and get the line
+                index += 1
+                line = file[index]
+                #Use the readAllTags function
+                keys,values,newIndex = readAllTags(file,index)
+                #And return the tag type
+                tags = Tag(keys,values)
+                #Updating the index
+                index = newIndex
+            else:
+                tags = Tag([],[])
+                index += 1
+            data=[type,id,lat,long,tags]
+            df[nNodes] = data
+            #df.loc[len(df)] = data
+        else:
+            index += 1
+        if index % 75000 == 0:
+            print(f"The index is currently {index} out of {len(file)}")
+
+    #Checking time of running
+    df = pd.DataFrame.from_dict(df).transpose()
+    df.columns = columns
+    endTime = time.time()
+    totalTime = endTime - startTime
+    mins = totalTime // 60
+    seconds = totalTime - (60 * mins)
+    print(f"Time it took to run: {mins} minutes and {seconds} seconds")
     return df
 
     
