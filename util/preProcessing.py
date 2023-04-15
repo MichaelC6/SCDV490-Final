@@ -1,6 +1,7 @@
 #These are functions associated with preprocessing data.
 
 import pandas as pd
+from astropy.table import table
 import numpy as np
 import overpy
 import os
@@ -125,7 +126,7 @@ def readXMLChunk(file):
 def readXML(path):
     startTime = time.time()
     #Opens the file from the path
-    file = open(path, 'r').readlines()[5:-2]
+    file = open(path, 'r').readlines()[3:]
     print("Path has been read.")
 
     #Creates the dataframe
@@ -168,12 +169,12 @@ def readXML(path):
             #df.loc[len(df)] = data
         else:
             index += 1
-        if index % 75000 == 0:
+        if index % 1000000 == 0:
             print(f"The index is currently {index} out of {len(file)}")
 
     #Checking time of running
-    df = pd.DataFrame.from_dict(df).transpose()
-    df.columns = columns
+    #dTable = table(data=df,names=("type","id","lat","long","tag"))
+    #df.columns = columns
     endTime = time.time()
     totalTime = endTime - startTime
     mins = totalTime // 60
@@ -181,4 +182,71 @@ def readXML(path):
     print(f"Time it took to run: {mins} minutes and {seconds} seconds")
     return df
 
-    
+def readXML3(path):
+    startTime = time.time()
+    #Opens the file from the path
+    file = open(path, 'r').readlines()[3:]
+    print("Path has been read.")
+
+    #Creates the dataframe
+    #columns = ['type','id','lat','long','tags']
+    #df = pd.DataFrame(data=None, columns=columns)
+    #df = [[],[],[],[],[]]
+    types = []
+    ids = []
+    lats = []
+    longs = []
+    allTags = []
+    print("DataFrame has been created")
+
+    #To avoid being above n time complexity, have to be a bit creative here.
+    index = 0
+    nNodes = 0
+    while index < len(file):
+        #print(f"CURRENT INDEX: {index}")
+        #Starts by getting the current line
+        line = file[index]
+        #Then it gets the type of the current line
+        type = getType(line)
+        #print(f"THE TYPE: {type}")
+        #If the type is a node, it gets all the info it needs
+        if type == 'node':
+            #nNodes += 1
+            id, lat, long = readNode(line)
+        #Then if the next row is a tag
+            if getType(file[index+1]) == 'tag':
+                #print("IN A TAG!")
+                #Go to the next row and get the line
+                index += 1
+                line = file[index]
+                #Use the readAllTags function
+                keys,values,newIndex = readAllTags(file,index)
+                #And return the tag type
+                tags = Tag(keys,values)
+                #Updating the index
+                index = newIndex
+            else:
+                tags = Tag([],[])
+                index += 1
+            #data=[type,id,lat,long,tags]
+            types.append(type)
+            ids.append(id)
+            lats.append(lat)
+            longs.append(long)
+            allTags.append(tags)
+            #df.loc[len(df)] = data
+        else:
+            index += 1
+        if index % 1000000 == 0:
+            print(f"The index is currently {index} out of {len(file)}")
+
+    #Checking time of running
+    #df = vaex.from_dict(df)
+    #df.columns = columns
+    t = QTable([types,ids,lats,longs,allTags],names=("type","id","lat","long","tag"))
+    endTime = time.time()
+    totalTime = endTime - startTime
+    mins = totalTime // 60
+    seconds = totalTime - (60 * mins)
+    print(f"Time it took to run: {mins} minutes and {seconds} seconds")
+    return t
