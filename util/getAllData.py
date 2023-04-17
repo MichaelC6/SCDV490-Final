@@ -21,4 +21,4 @@ for state in allStates:
     stateLink = link + state + "-latest.osm.bz2"
     filePath = os.path.join(path, "data", state + "-latest.osm.bz2")
     wget.download(stateLink,filePath)
-    run(f'bzip2 -dk {filePath}')
+    run(f'bzip2 -d {filePath}')
