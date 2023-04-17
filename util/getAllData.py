@@ -32,7 +32,7 @@ def main():
             wget.download(stateLink,filePath)
 
         if not os.path.exists(filePath[:-4]):
-            run(f'bunzip {filePath}')
+            run(f'bunzip2 {filePath}')
 
 if __name__ == '__main__':
     main()
