@@ -8,7 +8,9 @@ def main():
 
     s = Search('sampleData/test.xml')
 
-    s.search()
+    print(s.data)
+    
+    #s.search()
 
     print(s.goodLocs)
 if __name__ == '__main__':

@@ -11,12 +11,14 @@ dependencies:
    - pandas
    - numpy
    - scipy
+   - astropy
    - matplotlib
    - tensorflow
    - seaborn
    - pip:
      - overpy
      - lxml
+     - h5py
      - plotly==5.13.1
      - nbformat
      - kaleido
