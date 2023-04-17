@@ -9,7 +9,7 @@ from copy import deepcopy
 
 class Search():
 
-    def __init__(self, filepath):
+    def __init__(self, filepath, mp=16):
         '''
         filepath [str] : path to XML file to parse
         '''
@@ -17,7 +17,7 @@ class Search():
         self.filepath = filepath
 
         # read in the file with our XML parsing code
-        self.data = readXML(self.filepath, mp=8)
+        self.data = readXML(self.filepath, mp)
 
         print(self.data)
         
