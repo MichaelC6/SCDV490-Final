@@ -3,7 +3,7 @@
 import bz2
 import pandas as pd
 from astropy.table import Table, vstack
-from astropy.io.misc.hdf5 import write_table_hdf5
+from astropy.io.fits import writeto
 import numpy as np
 import overpy
 import os
@@ -19,8 +19,6 @@ def readXML(path, stateName, mp=12):
     print(f"Input file was read in {startTime-time.time()} seconds")
 
     #Creates the dataframe
-    columns = ['type','id','lat','long','tags']
-    #df = pd.DataFrame(data=None, columns=columns)
 
     if mp > 1:
         from multiprocessing import Pool
@@ -43,15 +41,15 @@ def readXML(path, stateName, mp=12):
         with Pool(mp) as p:
             out = p.map(readXMLChunk, files) 
 
-        ret =  vstack(out)
+        ret = vstack(out)
 
     else:
         ret = readXMLChunk(file)
 
-    file.close()
+    print(ret.as_array())
     # write out the astropy table
-    #print(f'Writing cleaned XML file to {stateName}-nodes.h5')
-    #write_table_hdf5(df, '{stateName}-nodes.h5')
+    print(f'Writing cleaned XML file to {stateName}-nodes.fits')
+    #ret.write('{stateName}-nodes.fits', format='fits', overwrite=True)
     
     endTime = time.time()
     totalTime = endTime - startTime
@@ -60,14 +58,13 @@ def readXML(path, stateName, mp=12):
     print(f"Time it took to run: {mins} minutes and {seconds} seconds")
     return ret
 
-
 def readXMLChunk(file):
     '''
     Read a small chunk of the state dataset
 
     file : open file object
     '''
-    df = {}
+    df = {'type': [],'id': [],'lat': [],'long': [],'tags': [] }
     
     #To avoid being above n time complexity, have to be a bit creative here.
     index = 0
@@ -99,16 +96,21 @@ def readXMLChunk(file):
                 #Updating the index
                 index = newIndex
             else:
-                tags = {} #Tag([],[])
+                tags = [] #Tag([],[])
                 index += 1
-            data=[type,id,lat,long,tags]
-            df[nNodes] = data
+
+            df['type'].append(type)
+            df['id'].append(id)
+            df['lat'].append(lat)
+            df['long'].append(long)
+            df['tags'].append(tags)
             #df.loc[len(df)] = data
         else:
             index += 1
         if index % 1000000 == 0:
             print(f"The index is currently {index} out of {len(file)}")
-
+            
+    print(df.keys())
     #Checking time of running
     df = Table(df)
 
