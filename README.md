@@ -33,3 +33,4 @@ To run the project code simply execute the following command from your
 favorite terminal: `./run.sh`
 
 run getAllData to get all the data.
+run bzip2 -dk [FILENAME]

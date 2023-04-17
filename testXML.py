@@ -24,9 +24,10 @@ print()
 print("We are running Dictionary version")
 
 
-table = readXML(testFile)
+table = readXML(testFile, 'new-york', 10)
 
-print(table.info)
+#print(table.info)
+print(table[0])
 #print(dict[0])
 
 print("This has finished running!")
