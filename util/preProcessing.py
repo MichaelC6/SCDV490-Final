@@ -9,11 +9,9 @@ import overpy
 import os
 from util.xmlTools import *
 import time
-file = None
 # This takes in the file path of data and return a dataframe.
 #This reads in the XML, it accepts path and returns a dataframe
 def readXML(path, stateName, mp=12):
-    global file
     startTime = time.time()
     #Opens the file from the path
     print(startTime)
@@ -63,13 +61,12 @@ def readXML(path, stateName, mp=12):
     return ret
 
 
-def readXMLChunk():
+def readXMLChunk(file):
     '''
     Read a small chunk of the state dataset
 
     file : open file object
     '''
-    global file
     df = {}
     
     #To avoid being above n time complexity, have to be a bit creative here.

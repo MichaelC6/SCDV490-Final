@@ -13,7 +13,7 @@ def main():
     args = parser.parse_args()
 
     stateName = os.path.split(args.infile)[-1].replace('-latest.osm.bz2', '')
-    s = Search(args.infile, stateName, mp=8)
+    s = Search(args.infile, stateName, mp=1)
     
     print(s.data)
     
