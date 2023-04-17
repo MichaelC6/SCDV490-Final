@@ -7,3 +7,5 @@ logs/*
 *.png
 *~
 *.osm
+*.bz2
+data/*
