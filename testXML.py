@@ -1,10 +1,10 @@
-from util.preProcessing import readXML,readXMLAsList,readXMLAsDict
+from util.preProcessing import readXML
 import os
 import pandas as pd
 
 dir = os.getcwd()
 
-file = 'test.xml'
+file = 'new-york-latest.osm'
 
 testFile = os.path.join(dir,'sampleData',file)
 
@@ -24,9 +24,9 @@ print()
 print("We are running Dictionary version")
 
 
-df3 = readXMLAsDict(testFile)
+table = readXML(testFile)
 
-print(df3.head())
+print(table.info)
 #print(dict[0])
 
 print("This has finished running!")

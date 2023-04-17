@@ -11,11 +11,10 @@ def nAppend(lists,values):
 def readNode(line):
     #The lines are split by spaces, so we need to split by spaces
     line = line.split(" ")
-
     #Just gets the information from the different parts of the line
     id = int(line[3][4:-1])
-    lat = float(line[4][5:-1])
-    long = float(line[5][5:-1])
+    lat = float(line[6][5:-1])
+    long = float(line[7][5:-4])
     return id, lat, long
 
 #This function reads a single tag line.
@@ -34,7 +33,12 @@ def readTag(line):
 
     #Taking the value part, splitting it again, taking the 2nd part through the last 4 characters.
     value_part = line[1]
-    value = value_part.split("v=\"")[1][:-4]
+
+    try:
+        value = value_part.split("v=\"")[1][:-4]
+    except IndexError:
+        value = ""
+    
     return key, value
 
 #This goes in tandem with readTags so that it can do multiple lines
