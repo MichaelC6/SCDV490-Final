@@ -18,6 +18,7 @@ dependencies:
    - pip:
      - overpy
      - lxml
+     - wget
      - h5py
      - plotly==5.13.1
      - nbformat
