@@ -1,4 +1,5 @@
 #This is a function to get map data for every state
+from subprocess import run
 import wget
 import os
 
@@ -12,7 +13,7 @@ allStates = ["alabama","arizona","arkansas","california","colorado","connecticut
              "rhode-island","south-carolina","south-dakota","tennessee","texas",
              "utah","vermont","virginia","washington","west-virginia","wisconsin","wyoming"]
 
-allStates = ["new-york"]
+allStates = ["rhode-island"]
 
 link = "https://download.geofabrik.de/north-america/us/"
 
@@ -20,3 +21,4 @@ for state in allStates:
     stateLink = link + state + "-latest.osm.bz2"
     filePath = os.path.join(path, "data", state + "-latest.osm.bz2")
     wget.download(stateLink,filePath)
+    run(f'bzip2 -dk {filePath}')
