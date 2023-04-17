@@ -15,13 +15,13 @@ import time
 def readXML(path, stateName, mp=12):
     startTime = time.time()
     #Opens the file from the path
-    file = bz2.open(path, 'r').readlines()[3:]
-    print("Path has been read.")
+    print(startTime)
+    file = open(path).readlines()[3:]
+    print(f"Input file was read in {startTime-time.time()} seconds")
 
     #Creates the dataframe
     columns = ['type','id','lat','long','tags']
     #df = pd.DataFrame(data=None, columns=columns)
-    df = {}
 
     if mp > 1:
         from multiprocessing import Pool
@@ -43,12 +43,13 @@ def readXML(path, stateName, mp=12):
         # read the chunks in with multiprocessing
         with Pool(mp) as p:
             out = p.map(readXMLChunk, files) 
-        
+
         ret =  vstack(out)
 
     else:
         ret = readChunk(file)
-    
+
+    file.close()
     # write out the astropy table
     #print(f'Writing cleaned XML file to {stateName}-nodes.h5')
     #write_table_hdf5(df, '{stateName}-nodes.h5')
@@ -58,7 +59,7 @@ def readXML(path, stateName, mp=12):
     mins = totalTime // 60
     seconds = totalTime - (60 * mins)
     print(f"Time it took to run: {mins} minutes and {seconds} seconds")
-    return df
+    return ret
 
 
 def readXMLChunk(file):
@@ -68,6 +69,8 @@ def readXMLChunk(file):
     file : open file object
     '''
 
+    df = {}
+    
     #To avoid being above n time complexity, have to be a bit creative here.
     index = 0
     nNodes = 0

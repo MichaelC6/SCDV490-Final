@@ -1,5 +1,5 @@
 '''
-Class to hold software for the search algorithm. First attempt is DFS
+Class to hold software for the search algorithm. First attempt is DF
 '''
 from util.preProcessing import readXML
 from util.mapFunctions import geodesicDist
@@ -9,7 +9,7 @@ from copy import deepcopy
 
 class Search():
 
-    def __init__(self, filepath, mp=16):
+    def __init__(self, filepath, stateName, mp=16):
         '''
         filepath [str] : path to XML file to parse
         '''
@@ -17,7 +17,7 @@ class Search():
         self.filepath = filepath
 
         # read in the file with our XML parsing code
-        self.data = readXML(self.filepath, mp)
+        self.data = readXML(self.filepath, stateName, mp)
 
         print(self.data)
         
