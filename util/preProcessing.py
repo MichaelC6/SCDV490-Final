@@ -2,8 +2,6 @@
 
 import bz2
 import pandas as pd
-from astropy.table import Table, vstack
-from astropy.io.fits import writeto
 import numpy as np
 import overpy
 import os
@@ -41,15 +39,16 @@ def readXML(path, stateName, mp=12):
         with Pool(mp) as p:
             out = p.map(readXMLChunk, files) 
 
-        ret = vstack(out)
+        #ret = vstack(out)
+        ret = pd.concat(out)
 
     else:
         ret = readXMLChunk(file)
 
-    print(ret.as_array())
-    # write out the astropy table
-    print(f'Writing cleaned XML file to {stateName}-nodes.fits')
-    #ret.write('{stateName}-nodes.fits', format='fits', overwrite=True)
+    # write out the pandas dataframe
+    outname = f'{stateName}-nodes.csv'
+    print(f'Writing cleaned XML file to {outname}')
+    ret.to_csv(outname)
     
     endTime = time.time()
     totalTime = endTime - startTime
@@ -110,8 +109,8 @@ def readXMLChunk(file):
         if index % 1000000 == 0:
             print(f"The index is currently {index} out of {len(file)}")
             
-    print(df.keys())
+    #print(df.keys())
     #Checking time of running
-    df = Table(df)
+    df = pd.DataFrame(df) #Table(df)
 
     return df
