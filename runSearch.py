@@ -12,12 +12,12 @@ def main():
     parser.add_argument('--infile', help='in file path', required=True)
     args = parser.parse_args()
 
-    stateName = os.path.split(args.infile)[-1].replace('-latest.osm.bz2', '')
+    stateName = os.path.split(args.infile)[-1].replace('-latest.osm', '')
     s = Search(args.infile, stateName, mp=1)
     
     print(s.data)
     
-    #s.search()
+    s.search()
 
     print(s.goodLocs)
 if __name__ == '__main__':

@@ -9,7 +9,7 @@ from util.xmlTools import *
 import time
 # This takes in the file path of data and return a dataframe.
 #This reads in the XML, it accepts path and returns a dataframe
-def readXML(path, stateName, mp=12):
+def readXML(path, outpath, mp=12):
     startTime = time.time()
     #Opens the file from the path
     print(startTime)
@@ -46,9 +46,8 @@ def readXML(path, stateName, mp=12):
         ret = readXMLChunk(file)
 
     # write out the pandas dataframe
-    outname = f'{stateName}-nodes.csv'
-    print(f'Writing cleaned XML file to {outname}')
-    ret.to_csv(outname)
+    print(f'Writing cleaned XML file to {outpath}')
+    ret.to_json(outpath)
     
     endTime = time.time()
     totalTime = endTime - startTime
@@ -63,7 +62,7 @@ def readXMLChunk(file):
 
     file : open file object
     '''
-    df = {'type': [],'id': [],'lat': [],'long': [],'tags': [] }
+    df = {'type': [],'id': [],'lat': [],'long': [],'tagKeys': [], 'tagVals': [] }
     
     #To avoid being above n time complexity, have to be a bit creative here.
     index = 0
@@ -91,18 +90,21 @@ def readXMLChunk(file):
                 if len(keys) != len(values):
                     raise Exception('number of keys and values is different!')
                 #tags = {key:value for key, value in zip(keys, values)}
-                tags = np.array([keys,values]).transpose()
+                tagKeys = list(keys)
+                tagVals = list(values)
                 #Updating the index
                 index = newIndex
             else:
-                tags = [] #Tag([],[])
+                tagKeys = []
+                tagVals = []
                 index += 1
 
             df['type'].append(type)
             df['id'].append(id)
             df['lat'].append(lat)
             df['long'].append(long)
-            df['tags'].append(tags)
+            df['tagKeys'].append(tagKeys)
+            df['tagVals'].append(tagVals)
             #df.loc[len(df)] = data
         else:
             index += 1
