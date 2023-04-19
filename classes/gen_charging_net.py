@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from copy import deepcopy
 
-class Search():
+class GenerateChargingNetwork():
 
     def __init__(self, filepath, stateName, mp=16):
         '''
@@ -28,15 +28,56 @@ class Search():
             
         self.goodLocs = []
         self.grid = None
+
+    def genChargingNetwork(self, mp=1):
+        '''
+        Create and return the locations of the nodes in the charging network
+        '''
+        self._gridData()
+
+        if mp > 1:
+            from multiprocessing import Pool
+            with Pool(mp) as p:
+                out = p.starmap(self._searchInBox, self.grid.values())
+
+        else:
+            mapOutput = map(self._searchInBox, self.grid.values())
+            out = list(mapOutput)
+            
+        return out
         
-    def getRelevantNodes(self):
+    def _searchInBox(self, boxVals, start=None, percent=0.1):
+        '''
+        Performs a search of nodes to find ideal locations of EV chargers
+
+        start (tuple) : tuple in the form (latitude, longitude), default is random start
+        boxKey (int) : integer number describing the box
+        boxVals (list): list of nodes in the box
+        percent (float): percent of nodes in the box to randomly choose to place a charger at
+        
+        return : list of list of Nodes to place at (or None)
+        '''
+
+        # check length of nodes in the grid
+        if len(boxVals) == 0:
+            return None
+
+        n = int(np.ceil(len(boxVals)*percent))
+        idxs = np.arange(0, len(boxVals), 1, dtype=int)
+
+        # choose n random idxs
+        chargerIdxs = np.random.choice(idxs, size=n, replace=False)
+        
+        return boxVals.iloc[chargerIdxs]
+                
+    def _getRelevantNodes(self):
         '''
         Gets the relevant rows from self.data for the search
         '''
         self.data = self.data[self.data.hasAmenity == True].reset_index(drop=True)  
         print(self.data)
 
-    def gridData(self):
+    def _gridData(self):
         '''
         Creates a 2D grid of locations on the map where each item inside the outer dictionary
         is a pandas dataframe
@@ -44,23 +85,29 @@ class Search():
         returns: dictionary where keys are the tile number
         '''
 
-        self.getRelevantNodes()
+        self._getRelevantNodes()
         
         grid = {}
         tileWidth = 5 # make each box in the grid a 5x5 mile box
 
         # coordinates of the box
-        bottomLeft = (self.data.long.min(), self.data.lat.min())
-        bottomRight = (self.data.long.max(), self.data.lat.min())
-        topLeft = (self.data.long.min(), self.data.lat.max())
-        topRight = (self.data.long.max(), self.data.lat.max())
+        bottomLeft = (self.data.lat.min(), self.data.long.min())
+        bottomRight = (self.data.lat.min(), self.data.long.max())
+        topLeft = (self.data.lat.max(), self.data.long.min())
+        topRight = (self.data.lat.max(), self.data.long.max())
 
         # start at bottom left corner
-        currLong = bottomLeft[0]
-        currLat = bottomLeft[1]
+        currLong = bottomLeft[1]
+        currLat = bottomLeft[0]
         origCurrLat = currLat
-        print(f'Bottom left corner: ({currLat}, {currLong})')
+        print(f'Bottom left corner: {bottomLeft}')
+        print(f'Bottom right corner: {bottomRight}')
+        print(f'top left corner: {topLeft}')
+        print(f'top right corner: {topRight}')
 
+        mapWidth = geodesicDist(bottomLeft[0], bottomLeft[1], bottomRight[0], bottomRight[1])
+        mapHeight = geodesicDist(bottomLeft[0], bottomLeft[1], topLeft[0], topLeft[1])
+        
         ii = 0
         currWidth = 0
         while currWidth < mapWidth:
@@ -81,26 +128,4 @@ class Search():
             currLat = origCurrLat
 
         self.grid = grid
-                
-    def searchInBox(self, start=None, d=83.5, tol=1):
-        '''
-        Performs a search of nodes to find ideal locations of EV chargers
-
-        start (tuple) : tuple in the form (latitude, longitude), default is random start
-        d (float) : distance miles between EV chargers, default is 83.5
-        tol (float) : distance in miles of tolerance on d, default is 1 
-
-        return : DataFrame of ideal EV charger locations
-        '''
-
-        self.getRelevantNodes()
-
-        # get random starting location if start is None
-        if start is None:
-            startIdx = np.random.randint(len(self.data))
-            curr = self.data.iloc[startIdx]
-        else:
-            startIdx = self.data.index[(self.data.lat == start[0]) * (self.data.long == start[1])]
-            curr = self.data.iloc[startIdx]
-
         

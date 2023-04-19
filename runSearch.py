@@ -3,7 +3,7 @@ Script to use the search software to simply run the search
 '''
 
 import os
-from classes.search import Search
+from classes.gen_charging_net import GenerateChargingNetwork
 
 def main():
 
@@ -13,12 +13,12 @@ def main():
     args = parser.parse_args()
 
     stateName = os.path.split(args.infile)[-1].replace('-latest.osm', '')
-    s = Search(args.infile, stateName, mp=1)
+    s = GenerateChargingNetwork(args.infile, stateName, mp=1)
     
     print(s.data)
     
-    s.gridData()
+    goodNodes = s.genChargingNetwork()
 
-    print(s.grid)
+    print(goodNodes)
 if __name__ == '__main__':
     main()
