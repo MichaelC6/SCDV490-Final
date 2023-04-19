@@ -17,8 +17,8 @@ def main():
     
     print(s.data)
     
-    s.search()
+    s.gridData()
 
-    print(s.goodLocs)
+    print(s.grid)
 if __name__ == '__main__':
     main()

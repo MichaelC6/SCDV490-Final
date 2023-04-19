@@ -3,7 +3,7 @@ Class to hold software for the search algorithm. First attempt is DF
 '''
 import os, ast
 from util.preProcessing import readXML
-from util.mapFunctions import geodesicDist
+from util.mapFunctions import *
 import numpy as np
 import pandas as pd
 from copy import deepcopy
@@ -27,16 +27,62 @@ class Search():
             self.data = readXML(self.filepath, outpath, mp)
             
         self.goodLocs = []
+        self.grid = None
         
     def getRelevantNodes(self):
         '''
         Gets the relevant rows from self.data for the search
         '''
-        self.data['hasAmenity'] = ['amenity' in row.tagKeys for ii,row in self.data.iterrows()]
         self.data = self.data[self.data.hasAmenity == True].reset_index(drop=True)  
         print(self.data)
+
+    def gridData(self):
+        '''
+        Creates a 2D grid of locations on the map where each item inside the outer dictionary
+        is a pandas dataframe
+
+        returns: dictionary where keys are the tile number
+        '''
+
+        self.getRelevantNodes()
         
-    def search(self, start=None, d=83.5, tol=1):
+        grid = {}
+        tileWidth = 5 # make each box in the grid a 5x5 mile box
+
+        # coordinates of the box
+        bottomLeft = (self.data.long.min(), self.data.lat.min())
+        bottomRight = (self.data.long.max(), self.data.lat.min())
+        topLeft = (self.data.long.min(), self.data.lat.max())
+        topRight = (self.data.long.max(), self.data.lat.max())
+
+        # start at bottom left corner
+        currLong = bottomLeft[0]
+        currLat = bottomLeft[1]
+        origCurrLat = currLat
+        print(f'Bottom left corner: ({currLat}, {currLong})')
+
+        ii = 0
+        currWidth = 0
+        while currWidth < mapWidth:
+            currHeight = 0
+            while currHeight < mapHeight:
+                # calculate the distances from the currentLatitude and current Longitude for every node
+                dist = geodesicDist(currLat, currLong, np.array(self.data.lat), np.array(self.data.long))
+                inGrid = np.where(dist < tileWidth)[0]
+
+                grid[ii] = self.data.iloc[inGrid]
+                ii += 1
+
+                currHeight += tileWidth
+                currLat = coordFromRadialDist(currLat, currLong, tileWidth, lon2=currLong)
+
+            currWidth += tileWidth
+            currLong = coordFromRadialDist(currLat, currLong, tileWidth, lat2=currLat)
+            currLat = origCurrLat
+
+        self.grid = grid
+                
+    def searchInBox(self, start=None, d=83.5, tol=1):
         '''
         Performs a search of nodes to find ideal locations of EV chargers
 
@@ -57,29 +103,4 @@ class Search():
             startIdx = self.data.index[(self.data.lat == start[0]) * (self.data.long == start[1])]
             curr = self.data.iloc[startIdx]
 
-        idx = startIdx
-        locs = deepcopy(self.data)
         
-        while True:
-            #print(type(curr.to_frame()), curr.to_frame())
-            self.goodLocs.append(curr.to_frame().transpose())
-
-            # remove row from input dataframe to prevent loops
-            locs = locs.drop(index=idx).reset_index(drop=True)
-            
-            # calculate the distances
-            dist = np.array(geodesicDist(curr.lat, curr.long, locs.lat, locs.long))
-
-            # find indexes that are close
-            sep = np.abs(dist-d)
-            m = np.min(sep)
-            idx = np.where(m == sep)[0][0]
-            #print(m, idx)
-            if sep[idx] < tol:
-                curr = locs.iloc[idx]
-            else:
-                print(f'Minimum seperation found: {m} miles')
-                print(f'No nodes found within {d} miles so search is done!')
-                break
-
-        self.goodLocs = pd.concat(self.goodLocs)

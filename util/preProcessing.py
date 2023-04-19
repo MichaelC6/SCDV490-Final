@@ -45,6 +45,9 @@ def readXML(path, outpath, mp=12):
     else:
         ret = readXMLChunk(file)
 
+    # add a column with if the node is an amenity        
+    ret['hasAmenity'] = ['amenity' in row.tagKeys for ii,row in ret.iterrows()]
+    
     # write out the pandas dataframe
     print(f'Writing cleaned XML file to {outpath}')
     ret.to_json(outpath)
