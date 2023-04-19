@@ -28,6 +28,7 @@ class GenerateChargingNetwork():
             
         self.goodLocs = []
         self.grid = None
+        self.gridCoordCenters = None
 
     def genChargingNetwork(self, mp=1):
         '''
@@ -60,7 +61,7 @@ class GenerateChargingNetwork():
 
         # check length of nodes in the grid
         if len(boxVals) == 0:
-            return None
+            return pd.DataFrame({})
 
         n = int(np.ceil(len(boxVals)*percent))
         idxs = np.arange(0, len(boxVals), 1, dtype=int)
@@ -86,7 +87,8 @@ class GenerateChargingNetwork():
         '''
 
         self._getRelevantNodes()
-        
+
+        gridCoords = {}
         grid = {}
         tileWidth = 5 # make each box in the grid a 5x5 mile box
 
@@ -120,6 +122,9 @@ class GenerateChargingNetwork():
                 grid[ii] = self.data.iloc[inGrid]
                 ii += 1
 
+                gridCoords[ii] = [coordFromRadialDist(currLat, currLong, tileWidth/2, lon2=currLong),
+                                  coordFromRadialDist(currLat, currLong, tileWidth/2, lat2=currLat)]
+                
                 currHeight += tileWidth
                 currLat = coordFromRadialDist(currLat, currLong, tileWidth, lon2=currLong)
 
@@ -128,4 +133,5 @@ class GenerateChargingNetwork():
             currLat = origCurrLat
 
         self.grid = grid
+        self.gridCoordCenters = gridCoords
         
