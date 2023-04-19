@@ -20,12 +20,13 @@ def main():
     
     goodNodes = s.genChargingNetwork()
 
-    print(goodNodes)
-
     # write goodNodes to a pickle file
+
+    out = list(zip(s.gridCoordCenters.values(), goodNodes))
+    print(out)
     outpath = os.path.join(os.path.split(args.infile)[0], f'{stateName}-out.pkl')
     with open(outpath, 'wb') as f:
-        pickle.dump(goodNodes, f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(out, f, pickle.HIGHEST_PROTOCOL)
     
 if __name__ == '__main__':
     main()
