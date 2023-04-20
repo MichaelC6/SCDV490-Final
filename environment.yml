@@ -15,6 +15,7 @@ dependencies:
    - matplotlib
    - tensorflow
    - seaborn
+   - nodejs
    - pip:
      - overpy
      - lxml
