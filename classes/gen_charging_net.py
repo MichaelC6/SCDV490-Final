@@ -47,7 +47,7 @@ class GenerateChargingNetwork():
             
         return out
         
-    def _searchInBox(self, boxVals, start=None, percent=0.1):
+    def _searchInBox(self, boxVals, start=None, percent=0.25):
         '''
         Performs a search of nodes to find ideal locations of EV chargers
 
@@ -78,7 +78,7 @@ class GenerateChargingNetwork():
         self.data = self.data[self.data.hasAmenity == True].reset_index(drop=True)  
         print(self.data)
 
-    def _gridData(self):
+    def _gridData(self, tileWidth=5):
         '''
         Creates a 2D grid of locations on the map where each item inside the outer dictionary
         is a pandas dataframe
@@ -90,7 +90,7 @@ class GenerateChargingNetwork():
 
         gridCoords = {}
         grid = {}
-        tileWidth = 5 # make each box in the grid a 5x5 mile box
+        #tileWidth = 5 # make each box in the grid a 5x5 mile box
 
         # coordinates of the box
         bottomLeft = (self.data.lat.min(), self.data.long.min())
