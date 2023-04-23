@@ -56,12 +56,15 @@ def readXML(path, outpath, mp=12):
     print(f"Time it took to run: {mins} minutes and {seconds} seconds")
     return ret
 
-def readXMLChunk(file):
+def readXMLChunk(path):
     '''
     Read a small chunk of the state dataset
 
     file : open file object
     '''
+
+    file = open(path).readlines()
+
     df = {'type': [],'id': [],'lat': [],'long': [],'tagKeys': [], 'tagVals': [] }
     
     #To avoid being above n time complexity, have to be a bit creative here.
@@ -79,7 +82,7 @@ def readXMLChunk(file):
             nNodes += 1
             id, lat, long = readNode(line)
         #Then if the next row is a tag
-            if getType(file[index+1]) == 'tag':
+            if index + 1 < len(file) - 1 and getType(file[index+1]) == 'tag':
                 #print("IN A TAG!")
                 #Go to the next row and get the line
                 index += 1
