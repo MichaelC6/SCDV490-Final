@@ -70,21 +70,14 @@ def chunkXML(path):
 
     return args
 
-if __name__ == '__main__':
-
-    import argparse
-    p = argparse.ArgumentParser()
-    p.add_argument('--filename', help='filename to convert from .osm to .json')
-    p.add_argument('--allStates', dest='allStates', action='store_true', help='should we run on all states?')
-    p.set_defaults(allStates=False)
-    args = p.parse_args()
+def convert(filename=None, allStates=False):
     
     dataFolder = os.path.join(os.getcwd(), "data", "osm")
     if not os.path.exists(dataFolder):
         os.makedirs(dataFolder)
     
-    if not args.allStates:
-        filenames = [args.filename]
+    if not allStates:
+        filenames = [filename]
     else:
         filenames = glob.glob(dataFolder+'*.osm')
 
@@ -133,3 +126,16 @@ if __name__ == '__main__':
         mins = totalTime // 60
         seconds = totalTime - (60 * mins)
         print(f"Time it took to parse {filename}: {mins} minutes and {seconds} seconds")
+
+    
+        
+if __name__ == '__main__':
+
+    import argparse
+    p = argparse.ArgumentParser()
+    p.add_argument('--filename', help='filename to convert from .osm to .json')
+    p.add_argument('--allStates', dest='allStates', action='store_true', help='should we run on all states?')
+    p.set_defaults(allStates=False)
+    args = p.parse_args()
+
+    convert(

@@ -1,7 +1,8 @@
 '''
 Class to hold software for the search algorithm. First attempt is DF
 '''
-import os, ast
+import os, time
+from multiprocessing import Pool, cpu_count
 from mapFunctions import *
 import numpy as np
 import pandas as pd
@@ -18,8 +19,10 @@ class GenerateChargingNetwork():
 
         # read in the file with our XML parsing code
         if os.path.exists(filepath):
-            print('Output file exists, reading in the data!') 
+            start = time.time()
+            print('Reading in the data!') 
             self.data = pd.read_json(filepath)
+            print(f'It took {time.time()-start:.4f} to read in the data')
         else:
             raise IOError('Please run getAllData before starting to generate the charging network')
             
@@ -27,24 +30,24 @@ class GenerateChargingNetwork():
         self.grid = None
         self.gridCoordCenters = None
 
-    def genChargingNetwork(self, mp=1):
+    def genChargingNetwork(self, mp=cpu_count()-1):
         '''
         Create and return the locations of the nodes in the charging network
         '''
         self._gridData()
 
         if mp > 1:
-            from multiprocessing import Pool
             with Pool(mp) as p:
-                out = p.starmap(self._searchInBox, self.grid.values())
+                mapOutput = p.map(self._searchInBox, [*self.grid])
 
         else:
-            mapOutput = map(self._searchInBox, self.grid.values())
-            out = list(mapOutput)
+            mapOutput = map(self._searchInBox, [*self.grid])
+
+        out = list(mapOutput)
             
         return out
         
-    def _searchInBox(self, boxVals, start=None, percent=0.25):
+    def _searchInBox(self, idx, percent=0.25):
         '''
         Performs a search of nodes to find ideal locations of EV chargers
 
@@ -56,6 +59,8 @@ class GenerateChargingNetwork():
         return : list of list of Nodes to place at (or None)
         '''
 
+        boxVals = self.grid[idx]
+        
         # check length of nodes in the grid
         if len(boxVals) == 0:
             return pd.DataFrame({})
@@ -117,14 +122,14 @@ class GenerateChargingNetwork():
                 inGrid = np.where(dist < tileWidth)[0]
 
                 grid[ii] = self.data.iloc[inGrid]
-                ii += 1
-
                 gridCoords[ii] = [coordFromRadialDist(currLat, currLong, tileWidth/2, lon2=currLong),
                                   coordFromRadialDist(currLat, currLong, tileWidth/2, lat2=currLat)]
                 
                 currHeight += tileWidth
                 currLat = coordFromRadialDist(currLat, currLong, tileWidth, lon2=currLong)
 
+                ii += 1
+                
             currWidth += tileWidth
             currLong = coordFromRadialDist(currLat, currLong, tileWidth, lat2=currLat)
             currLat = origCurrLat
