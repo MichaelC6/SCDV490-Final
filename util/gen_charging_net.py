@@ -2,8 +2,7 @@
 Class to hold software for the search algorithm. First attempt is DF
 '''
 import os, ast
-from util.preProcessing import readXML
-from util.mapFunctions import *
+from mapFunctions import *
 import numpy as np
 import pandas as pd
 from copy import deepcopy

@@ -80,7 +80,7 @@ if __name__ == '__main__':
     p.set_defaults(allStates=False)
     args = p.parse_args()
 
-    dataFolder = os.path.join(os.getcwd(), "data")
+    dataFolder = os.path.join(os.getcwd(), "data", "osm")
     if not os.path.exists(dataFolder):
         os.makedirs(dataFolder)
     
@@ -89,6 +89,8 @@ if __name__ == '__main__':
     else:
         filenames = glob.glob(dataFolder+'*.osm')
 
+    jsonPath = os.path.join(os.path.dirname(dataFolder), "jsons")
+        
     for filename in filenames:
 
         jsonName = filename.split('.')[0] + '.json'
@@ -97,8 +99,6 @@ if __name__ == '__main__':
     
         filePath = os.path.join(dataFolder, filename)
         
-        jsonPath = os.path.join(dataFolder, "jsons")
-    
         if not os.path.exists(jsonPath):
             os.makedirs(jsonPath)
             print("made new path")
@@ -134,4 +134,4 @@ if __name__ == '__main__':
         totalTime = endTime - startTime
         mins = totalTime // 60
         seconds = totalTime - (60 * mins)
-        print(f"Time it took to run: {mins} minutes and {seconds} seconds")
+        print(f"Time it took to parse {filename}: {mins} minutes and {seconds} seconds")
