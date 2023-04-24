@@ -29,6 +29,10 @@ def getStateChargingNetwork(f, verbose=False):
     with open(outpath, 'wb') as f:
         pickle.dump(out, f, pickle.HIGHEST_PROTOCOL)
 
+    # write good nodes to a csv
+    good = [item for item in goodNodes if len(item) > 0]
+    allNodes = pd.concat(good)
+    allNodes.to_csv('sampleData/rhode-island-node-coordinates.csv', header=True, index=False)
 
 def main():
 
