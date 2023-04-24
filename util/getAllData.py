@@ -20,7 +20,7 @@ def main():
                  "rhode-island","south-carolina","south-dakota","tennessee","texas",
                  "utah","vermont","virginia","washington","west-virginia","wisconsin","wyoming"]
 
-    allStates = ["rhode-island"]
+    allStates = ["new-york"]
 
     link = "https://download.geofabrik.de/north-america/us/"
 
