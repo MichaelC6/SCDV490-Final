@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     import argparse
     p = argparse.ArgumentParser()
-    p.add_argument('--filename', help='filename to convert from .osm to .json', required=True)
+    p.add_argument('--filename', help='filename to convert from .osm to .json')
     p.add_argument('--allStates', dest='allStates', action='store_true', help='should we run on all states?')
     p.set_defaults(allStates=False)
     args = p.parse_args()
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     if not os.path.exists(dataFolder):
         os.makedirs(dataFolder)
     
-    if not allState:
+    if not args.allStates:
         filenames = [args.filename]
     else:
         filenames = glob.glob(dataFolder+'*.osm')

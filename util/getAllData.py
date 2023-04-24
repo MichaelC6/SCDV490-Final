@@ -7,12 +7,16 @@ import argparse
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--outdir', help='output directory', default=os.getcwd())
+    parser.add_argument('--outdir', help='output directory', default=None)
     parser.add_argument('--state', help='download one state', default=None)
     args = parser.parse_args()
     
     path = args.outdir
     specificState = args.state
+
+    if path is None:
+        path = os.getcwd()
+        print(f'WARNING! outputting files to your current working directory: {path}')
 
     if specificState == None:
 
@@ -24,14 +28,15 @@ def main():
                     "rhode-island","south-carolina","south-dakota","tennessee","texas",
                     "utah","vermont","virginia","washington","west-virginia","wisconsin","wyoming"]
 
-    allStates = [specificState]
+    else:
+        allStates = [specificState]
 
     link = "https://download.geofabrik.de/north-america/us/"
     
     for state in allStates:
         stateLink = link + state + "-latest.osm.bz2"
         filePath = os.path.join(path, state + "-latest.osm.bz2")
-
+        
         if not os.path.exists(filePath):
             wget.download(stateLink,filePath)
 

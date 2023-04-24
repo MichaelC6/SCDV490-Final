@@ -10,18 +10,17 @@ from copy import deepcopy
 
 class GenerateChargingNetwork():
 
-    def __init__(self, filepath, stateName, mp=16):
+    def __init__(self, filepath):
         '''
         filepath [str] : path to XML file to parse
         '''
 
         self.filepath = filepath
 
-        outpath = os.path.join(os.path.split(self.filepath)[0], f'{stateName}-preprocessed.json')
         # read in the file with our XML parsing code
-        if os.path.exists(outpath):
+        if os.path.exists(filepath):
             print('Output file exists, reading in the data!') 
-            self.data = pd.read_json(outpath)
+            self.data = pd.read_json(filepath)
         else:
             raise IOError('Please run getAllData before starting to generate the charging network')
             
