@@ -20,18 +20,18 @@ def main():
 
     if not os.path.exists(path):
         os.makedirs(path)
-        
-    if specificState == None:
 
-        allStates = ["alabama","arizona","arkansas","california","colorado","connecticut","delaware",
-                    "district-of-columbia","florida","georgia","idaho","illinois","indiana","iowa",
-                    "kansas","kentucky","louisiana","maine","maryland","massachusetts","michigan","minnesota",
-                    "mississippi","missouri","montana","nebraska","nevada","new-hampshire","new-jersey","new-mexico",
-                    "new-york","north-carolina","north-dakota","ohio","oklahoma","oregon","pennsylvania",
-                    "rhode-island","south-carolina","south-dakota","tennessee","texas",
-                    "utah","vermont","virginia","washington","west-virginia","wisconsin","wyoming"]
-
-    else:
+    allStates = ["alabama","arizona","arkansas","california","colorado","connecticut","delaware",
+                 "district-of-columbia","florida","georgia","idaho","illinois","indiana","iowa",
+                 "kansas","kentucky","louisiana","maine","maryland","massachusetts","michigan","minnesota",
+                 "mississippi","missouri","montana","nebraska","nevada","new-hampshire","new-jersey","new-mexico",
+                 "new-york","north-carolina","north-dakota","ohio","oklahoma","oregon","pennsylvania",
+                 "rhode-island","south-carolina","south-dakota","tennessee","texas",
+                 "utah","vermont","virginia","washington","west-virginia","wisconsin","wyoming"]
+    
+    if specificState is not None:
+        if specificState not in allStates:
+            raise IOError('You provided {specificState} which is invalid. Please provide a valid input state!')
         allStates = [specificState]
 
     link = "https://download.geofabrik.de/north-america/us/"
@@ -39,14 +39,17 @@ def main():
     for state in allStates:
         stateLink = link + state + "-latest.osm.bz2"
         filePath = os.path.join(path, state + "-latest.osm.bz2")
-        
-        if not os.path.exists(filePath):
-            print(f'Downloading {stateLink}')
-            wget.download(stateLink,filePath)
+        outfile = os.path.join(path, state + "-latest.osm")
 
-        if not os.path.exists(filePath[:-4]):
-            print(f'Unpacking {filePath}')
-            run(f'bunzip2 {filePath}', shell=True)
+        if os.path.exists(outfile):
+            print(f'WARNING! Skipping {stateLink} because the output already exists')
+            continue
+            
+        print(f'Downloading {stateLink}')
+        wget.download(stateLink,filePath)
+
+        print(f'Unpacking {filePath}')
+        run(f'bunzip2 {filePath}', shell=True)
 
 if __name__ == '__main__':
     main()

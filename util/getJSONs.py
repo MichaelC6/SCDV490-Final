@@ -76,7 +76,9 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--filename', help='filename to convert from .osm to .json')
     p.add_argument('--allStates', dest='allStates', action='store_true', help='should we run on all states?')
+    p.add_argument('--overwrite', dest='overwrite', action='store_true', help='should we overwrite existing files?')
     p.set_defaults(allStates=False)
+    p.set_defaults(overwrite=False)
     args = p.parse_args()
     
     dataFolder = os.path.join(os.getcwd(), "data", "osm")
@@ -96,7 +98,11 @@ if __name__ == '__main__':
     for filename in filenames:
 
         jsonName = filename.split('.')[0] + '.json'
-    
+        jsonFilePath = os.path.join(jsonPath, jsonName)
+        if os.path.exists(jsonFilePath) and not args.overwrite:
+            print(f'WARNING! Skipping {filename} because the json already exists')
+            continue
+            
         startTime = time.time()
     
         filePath = os.path.join(dataFolder, filename)
@@ -118,9 +124,9 @@ if __name__ == '__main__':
         ret['hasAmenity'] = ['amenity' in row.tagKeys for ii,row in ret.iterrows()]
     
         # write out the pandas dataframe
-        print(f'Writing cleaned XML file to {os.path.join(jsonPath, jsonName)}')
+        print(f'Writing cleaned XML file to {jsonFilePath}')
 
-        ret.to_json(os.path.join(jsonPath, jsonName))
+        ret.to_json(jsonFilePath)
         print("Finished Processing")
 
         for c in allChunks:
