@@ -4,9 +4,8 @@ import pandas as pd
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..')) 
-from util.preProcessing import readXMLChunk
-import numpy as np
 from util.xmlTools import *
+import numpy as np
 
 #startTime = time.time()
 
