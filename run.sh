@@ -8,3 +8,6 @@ python3 util/getJSONs.py --allStates
 
 # generate charging network files
 python3 util/getChargingNetwork.py
+
+# generate all the analysis plots
+python3 util/makePlots.py

@@ -18,6 +18,9 @@ def main():
         path = os.getcwd()
         print(f'WARNING! outputting files to your current working directory: {path}')
 
+    if not os.path.exists(path):
+        os.makedirs(path)
+        
     if specificState == None:
 
         allStates = ["alabama","arizona","arkansas","california","colorado","connecticut","delaware",
