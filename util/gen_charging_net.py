@@ -23,8 +23,7 @@ class GenerateChargingNetwork():
             print('Output file exists, reading in the data!') 
             self.data = pd.read_json(outpath)
         else:
-            print('Output file does not exist, cleaning the input file')
-            self.data = readXML(self.filepath, outpath, mp)
+            raise IOError('Please run getAllData before starting to generate the charging network')
             
         self.goodLocs = []
         self.grid = None
