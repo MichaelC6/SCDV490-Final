@@ -41,9 +41,11 @@ def main():
         filePath = os.path.join(path, state + "-latest.osm.bz2")
         
         if not os.path.exists(filePath):
+            print(f'Downloading {stateLink}')
             wget.download(stateLink,filePath)
 
         if not os.path.exists(filePath[:-4]):
+            print(f'Unpacking {filePath}')
             run(f'bunzip2 {filePath}', shell=True)
 
 if __name__ == '__main__':

@@ -3,6 +3,7 @@ Script to use the search software to simply run the search
 '''
 
 import os
+import glob
 import time
 import pickle
 from gen_charging_net import GenerateChargingNetwork
