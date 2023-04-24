@@ -88,7 +88,7 @@ if __name__ == '__main__':
     if not args.allStates:
         filenames = [args.filename]
     else:
-        filenames = glob.glob(dataFolder+'*.osm')
+        filenames = glob.glob(os.path.join(dataFolder, '*.osm'))
 
     jsonPath = os.path.join(os.path.dirname(dataFolder), "jsons")
     if not os.path.exists(jsonPath):

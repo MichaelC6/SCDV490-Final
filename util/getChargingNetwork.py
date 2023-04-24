@@ -51,7 +51,7 @@ def main():
     
     if args.infile is None:
         infiledir = os.path.join(os.getcwd(), 'data', 'jsons')
-        filenames = glob.glob(infiledir+'*.json')
+        filenames = glob.glob(os.path.join(infiledir, '*.json'))
     else:
         infiledir = os.path.dirname(args.infile)
         filenames = [args.infile]
