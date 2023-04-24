@@ -4,7 +4,7 @@ Script to use the search software to simply run the search
 
 import os
 import pickle
-from classes.gen_charging_net import GenerateChargingNetwork
+from util.gen_charging_net import GenerateChargingNetwork
 
 def main():
 

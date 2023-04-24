@@ -6,12 +6,6 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..')) 
 from util.xmlTools import *
 import numpy as np
-
-#startTime = time.time()
-
-#cores = mp.cpu_count()
-#numFiles = cores * 10
-#indicies = np.linspace(0,len(file)-1,numFiles, dtype=int)
     
 def writeXML(args):
     section, outfile = args
@@ -77,9 +71,29 @@ def chunkXML(path):
     return args
 
 if __name__ == '__main__':
+
+    import argparse
+    p = argparse.ArgumentParser()
+    p.add_argument('--filename', help='filename to convert from .osm to .json', required=True)
+    args = p.parse_args()
+
+    filename = args.filename
+    jsonName = filename.split('.')[0] + '.json'
+    
     startTime = time.time()
+    
     dataFolder = os.path.join(os.getcwd(), "data")
-    filePath = os.path.join(dataFolder, 'new-york-latest.osm')
+    if not os.path.exists(dataFolder):
+        os.makedirs(dataFolder)
+    
+    filePath = os.path.join(dataFolder, filename)
+
+    jsonPath = os.path.join(dataFolder, "jsons")
+    
+    if not os.path.exists(jsonPath):
+        os.makedirs(jsonPath)
+        print("made new path")
+    
     args = chunkXML(filePath)
     cores = mp.cpu_count() - 1
     with mp.Pool(cores) as p:
@@ -94,18 +108,12 @@ if __name__ == '__main__':
     ret.reset_index(inplace=True)
     p.close()
 
-    jsonPath = os.path.join(dataFolder, "jsons")
-
-    if not os.path.exists(jsonPath):
-        os.makedirs(jsonPath)
-        print("made new path")
-    
     ret['hasAmenity'] = ['amenity' in row.tagKeys for ii,row in ret.iterrows()]
     
     # write out the pandas dataframe
-    print(f'Writing cleaned XML file to {os.path.join(jsonPath, "rhode-island.json")}')
+    print(f'Writing cleaned XML file to {os.path.join(jsonPath, jsonName)}')
 
-    ret.to_json(os.path.join(jsonPath, "rhode-island.json"))
+    ret.to_json(os.path.join(jsonPath, jsonName))
     print("Finished Processing")
 
     for c in allChunks:
