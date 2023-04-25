@@ -91,7 +91,7 @@ def readXMLChunk(path):
     file : open file object
     '''
 
-    file = open(path).readlines()
+    file = open(path, encoding='UTF-8',).readlines()
 
     df = {'type': [],'id': [],'lat': [],'long': [],'tagKeys': [], 'tagVals': [] }
     
@@ -102,13 +102,18 @@ def readXMLChunk(path):
         #print(f"CURRENT INDEX: {index}")
         #Starts by getting the current line
         line = file[index]
+
         #Then it gets the type of the current line
         type = getType(line)
         #print(f"THE TYPE: {type}")
         #If the type is a node, it gets all the info it needs
         if type == 'node':
             nNodes += 1
-            id, lat, long = readNode(line)
+            try:
+                id, lat, long = readNode(line)
+            except IndexError:
+                #print(line)
+                continue
         #Then if the next row is a tag
             if index + 1 < len(file) - 1 and getType(file[index+1]) == 'tag':
                 #print("IN A TAG!")

@@ -28,7 +28,7 @@ def chunkXML(path):
 
     cores = mp.cpu_count() - 1
 
-    numFiles = cores * 10
+    numFiles = cores
 
     indicies = np.linspace(0,len(file)-1,numFiles, dtype=int)
 
@@ -90,15 +90,18 @@ if __name__ == '__main__':
     else:
         filenames = glob.glob(os.path.join(dataFolder, '*.osm'))
 
-    jsonPath = os.path.join(os.path.dirname(dataFolder), "jsons")
+    jsonPath = os.path.join(os.getcwd(),"data","jsons")
     if not os.path.exists(jsonPath):
         os.makedirs(jsonPath)
         print("made new path")
     
     for filename in filenames:
-
-        jsonName = filename.split('.')[0] + '.json'
-        jsonFilePath = os.path.join(jsonPath, jsonName)
+        print(f"CURRENTLY DOING {filename}")
+        jsonName = filename.split("/")[-1].split('.')[0] + '.json'
+        print(jsonName)
+        print(f"C DIRECT {os.getcwd()}")
+        jsonFilePath = os.path.join(os.getcwd(),"data","jsons",jsonName)
+        print(f"FILE PATH: {jsonFilePath}")
         if os.path.exists(jsonFilePath) and not args.overwrite:
             print(f'WARNING! Skipping {filename} because the json already exists')
             continue
