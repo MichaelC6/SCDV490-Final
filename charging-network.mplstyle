@@ -2,11 +2,15 @@
 
 # Use the ggplot style as a base
 axes.style         : ggplot
+axes.titleweight: bold
+axes.labelweight: bold
+
 
 # Set font family and size for axis labels and titles
 axes.labelsize     : 18
 axes.titlesize     : 22
 font.family        : sans-serif
+font.weight: bold
 
 # Increase line width and marker size for better visibility
 lines.linewidth    : 2
@@ -23,6 +27,7 @@ grid.linestyle     : --
 
 # Set figure size
 figure.figsize     : 12, 8
+figure.titleweight: bold
 
 # Set color cycle for colorblind-friendly colors
 axes.prop_cycle    : cycler('color', ['d62728', '7f7f7f', '2ca02c', '9467bd', '8c564b', 'e377c2'])
