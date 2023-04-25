@@ -1,5 +1,8 @@
-from classes.tag import Tag
 import re
+import pandas as pd
+import gc
+
+file = None
 
 #This is a quick function to append a multi-output function
 #To different lists at once
@@ -42,7 +45,8 @@ def readTag(line):
     return key, value
 
 #This goes in tandem with readTags so that it can do multiple lines
-def readAllTags(file,index):
+def readAllTags(index):
+    global file
     #Makes the two empty lists
     keys = []
     values = []
@@ -83,4 +87,74 @@ def getType(line):
     #If nothing else, just return None because it's about identification
     else:
         return None
+    
+def readXMLChunk(path):
+    '''
+    Read a small chunk of the state dataset
+
+    file : open file object
+    '''
+
+    file = open(path, encoding='UTF-8',).readlines()
+
+    df = {'type': [],'id': [],'lat': [],'long': [],'tagKeys': [], 'tagVals': [] }
+    
+    #To avoid being above n time complexity, have to be a bit creative here.
+    index = 0
+    nNodes = 0
+    while index < len(file):
+        #print(f"CURRENT INDEX: {index}")
+        #Starts by getting the current line
+        line = file[index]
+
+        #Then it gets the type of the current line
+        type = getType(line)
+        #print(f"THE TYPE: {type}")
+        #If the type is a node, it gets all the info it needs
+        if type == 'node':
+            nNodes += 1
+            try:
+                id, lat, long = readNode(line)
+            except IndexError:
+                #print(line)
+                continue
+        #Then if the next row is a tag
+            if index + 1 < len(file) - 1 and getType(file[index+1]) == 'tag':
+                #print("IN A TAG!")
+                #Go to the next row and get the line
+                index += 1
+                line = file[index]
+                #Use the readAllTags function
+                keys,values,newIndex = readAllTags(index)
+                #And return the tag type
+                if len(keys) != len(values):
+                    raise Exception('number of keys and values is different!')
+                #tags = {key:value for key, value in zip(keys, values)}
+                tagKeys = list(keys)
+                tagVals = list(values)
+                #Updating the index
+                index = newIndex
+            else:
+                tagKeys = []
+                tagVals = []
+                index += 1
+
+            df['type'].append(type)
+            df['id'].append(id)
+            df['lat'].append(lat)
+            df['long'].append(long)
+            df['tagKeys'].append(tagKeys)
+            df['tagVals'].append(tagVals)
+            #df.loc[len(df)] = data
+        else:
+            index += 1
+        if index % 1000000 == 0:
+            print(f"The index is currently {index} out of {len(file)}")
+    del file
+    gc.collect()
+    #print(df.keys())
+    #Checking time of running
+    df = pd.DataFrame(df) #Table(df)
+
+    return df
     

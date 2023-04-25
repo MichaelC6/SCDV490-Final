@@ -12,8 +12,7 @@ of electric car chargers throughout the US road network.
 For this project we used the open source map data available on the website
 OpenStreetPath. The link to the OpenStreetPath website is
 [https://www.openstreetmap.org/#map=8/39.330/-93.439](https://www.openstreetmap.org/#map=8/39.330/-93.439).
-We will primarily be using the `overpy` library which is located at the following
-doc link [https://python-overpy.readthedocs.io/en/latest/introduction.html](https://python-overpy.readthedocs.io/en/latest/introduction.html).
+We can download OSM files (which are very similar to XML files) for each state.
 
 ## Environment Setup
 
@@ -30,7 +29,10 @@ you will be running this code.
 
 ## Running the Project Code
 To run the project code simply execute the following command from your
-favorite terminal: `./run.sh`
+favorite terminal: `./run.sh`. Note: this will take a very long time (even though it
+is very optimized)
 
-run getAllData to get all the data.
-run bzip2 -dk [FILENAME]
+On the other hand, you can run the analysis for a certain state by doing
+`./run-state.sh state-name` where state-name should be replaced by a state name
+that is all lower case and spaces are separated by a -. For example, New York
+would be `./run-state.sh new-york`.

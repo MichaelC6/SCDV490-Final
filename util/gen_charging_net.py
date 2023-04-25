@@ -1,53 +1,53 @@
 '''
 Class to hold software for the search algorithm. First attempt is DF
 '''
-import os, ast
-from util.preProcessing import readXML
-from util.mapFunctions import *
+import os, time
+from multiprocessing import Pool, cpu_count
+from mapFunctions import *
 import numpy as np
 import pandas as pd
 from copy import deepcopy
 
 class GenerateChargingNetwork():
 
-    def __init__(self, filepath, stateName, mp=16):
+    def __init__(self, filepath):
         '''
         filepath [str] : path to XML file to parse
         '''
 
         self.filepath = filepath
 
-        outpath = os.path.join(os.path.split(self.filepath)[0], f'{stateName}-preprocessed.json')
         # read in the file with our XML parsing code
-        if os.path.exists(outpath):
-            print('Output file exists, reading in the data!') 
-            self.data = pd.read_json(outpath)
+        if os.path.exists(filepath):
+            start = time.time()
+            print('Reading in the data!') 
+            self.data = pd.read_json(filepath)
+            print(f'It took {time.time()-start:.4f} to read in the data')
         else:
-            print('Output file does not exist, cleaning the input file')
-            self.data = readXML(self.filepath, outpath, mp)
+            raise IOError('Please run getAllData before starting to generate the charging network')
             
         self.goodLocs = []
         self.grid = None
         self.gridCoordCenters = None
 
-    def genChargingNetwork(self, mp=1):
+    def genChargingNetwork(self, mp=cpu_count()-1):
         '''
         Create and return the locations of the nodes in the charging network
         '''
         self._gridData()
 
         if mp > 1:
-            from multiprocessing import Pool
             with Pool(mp) as p:
-                out = p.starmap(self._searchInBox, self.grid.values())
+                mapOutput = p.map(self._searchInBox, [*self.grid])
 
         else:
-            mapOutput = map(self._searchInBox, self.grid.values())
-            out = list(mapOutput)
+            mapOutput = map(self._searchInBox, [*self.grid])
+
+        out = list(mapOutput)
             
         return out
         
-    def _searchInBox(self, boxVals, start=None, percent=0.25):
+    def _searchInBox(self, idx, percent=0.25):
         '''
         Performs a search of nodes to find ideal locations of EV chargers
 
@@ -59,6 +59,8 @@ class GenerateChargingNetwork():
         return : list of list of Nodes to place at (or None)
         '''
 
+        boxVals = self.grid[idx]
+        
         # check length of nodes in the grid
         if len(boxVals) == 0:
             return pd.DataFrame({})
@@ -120,14 +122,14 @@ class GenerateChargingNetwork():
                 inGrid = np.where(dist < tileWidth)[0]
 
                 grid[ii] = self.data.iloc[inGrid]
-                ii += 1
-
                 gridCoords[ii] = [coordFromRadialDist(currLat, currLong, tileWidth/2, lon2=currLong),
                                   coordFromRadialDist(currLat, currLong, tileWidth/2, lat2=currLat)]
                 
                 currHeight += tileWidth
                 currLat = coordFromRadialDist(currLat, currLong, tileWidth, lon2=currLong)
 
+                ii += 1
+                
             currWidth += tileWidth
             currLong = coordFromRadialDist(currLat, currLong, tileWidth, lat2=currLat)
             currLat = origCurrLat
