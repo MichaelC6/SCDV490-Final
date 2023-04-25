@@ -1,5 +1,8 @@
 import re
 import pandas as pd
+import gc
+
+file = None
 
 #This is a quick function to append a multi-output function
 #To different lists at once
@@ -42,7 +45,8 @@ def readTag(line):
     return key, value
 
 #This goes in tandem with readTags so that it can do multiple lines
-def readAllTags(file,index):
+def readAllTags(index):
+    global file
     #Makes the two empty lists
     keys = []
     values = []
@@ -121,7 +125,7 @@ def readXMLChunk(path):
                 index += 1
                 line = file[index]
                 #Use the readAllTags function
-                keys,values,newIndex = readAllTags(file,index)
+                keys,values,newIndex = readAllTags(index)
                 #And return the tag type
                 if len(keys) != len(values):
                     raise Exception('number of keys and values is different!')
@@ -146,7 +150,8 @@ def readXMLChunk(path):
             index += 1
         if index % 1000000 == 0:
             print(f"The index is currently {index} out of {len(file)}")
-            
+    del file
+    gc.collect()
     #print(df.keys())
     #Checking time of running
     df = pd.DataFrame(df) #Table(df)

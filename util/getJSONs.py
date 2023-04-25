@@ -7,12 +7,17 @@ import glob
 sys.path.append(os.path.join(os.path.dirname(__file__), '..')) 
 from util.xmlTools import *
 import numpy as np
+import itertools
+import gc
     
 def writeXML(args):
     section, outfile = args
     file = open(outfile, 'w', encoding='utf-8')
     file.writelines(section)
     file.close()
+    del file
+    gc.collect()
+
 
 def getAllChunks():
     allChunksPath = os.path.join(os.getcwd(), "data", "osm", "temp")
@@ -26,11 +31,11 @@ def chunkXML(path):
     #Opens the file from the path
     file = open(path).readlines()[3:]
 
-    cores = mp.cpu_count() - 1
+    cores = 5
 
-    numFiles = cores
+    numFiles = mp.cpu_count() - 1
 
-    indicies = np.linspace(0,len(file)-1,numFiles, dtype=int)
+    indicies = np.linspace(3,len(file)-1,numFiles+1, dtype=int)
 
     newPath = os.path.join(os.getcwd(), "data", "osm", "temp")
 
@@ -51,24 +56,44 @@ def chunkXML(path):
             line = file[indicies[i]]
             endline = file[indicies[i + 1]]
 
+    # once indicies are adjusted we no longer need the file and can kill it 
+    del file
+    gc.collect()
 
-    sections = []
+    file = open(path)
+    sectionIndex = 0
     files = []
-
-    for i,j in zip(indicies[:-1], indicies[1:]):
-        sections.append(file[i:j])
-        files.append(os.path.join(newPath, str(i) + "-" + str(j) + ".osm"))
+    barriers = list(zip(indicies[:-1], indicies[1:]))
+    lastBarrier = len(barriers) - 1
+    sections = [[]] * numFiles
+    index = 3
+    bBar,eBar = barriers[sectionIndex]
+    for line in file:
+        if index >= bBar and index < eBar:
+            sections[sectionIndex].append(line)
+            index += 1
+        else:
+            if index == barriers[lastBarrier][1]:
+                sections[-1].append(line)
+                files.append(os.path.join(newPath, str(bBar) + "-" + str(eBar) + ".osm"))
+            else:
+                #print(f"SINDEX: {sectionIndex} OUT OF {len(barriers)-1}")
+                #print(f"THE INDEX IS {index} out of {barriers[lastBarrier]}")
+                files.append(os.path.join(newPath, str(bBar) + "-" + str(eBar) + ".osm"))
+                sectionIndex += 1
+                bBar,eBar = barriers[sectionIndex]
+                sections[sectionIndex].append(line)
+                index += 1
     
+    file.close()
+    del file
+    gc.collect()
+
     print("got each file indicies")
 
-    file = None
-
     #Now we need to export each file    
-    args = []
-    for s,f in zip(sections,files):
-        args.append([s,f])
 
-    return args
+    return list(zip(sections,files))
 
 if __name__ == '__main__':
 
@@ -112,10 +137,14 @@ if __name__ == '__main__':
         
         args = chunkXML(filePath)
         cores = mp.cpu_count() - 1
-        with mp.Pool(cores) as p:
-            p.map(writeXML, args) 
-            p.close()
+        for arg in args:
+            writeXML(arg)
+        # with mp.Pool(cores) as p:
+        #     p.map(writeXML, args) 
+        #     p.close()
         print("Finished Splitting")
+        del args
+        gc.collect()
 
         allChunks = getAllChunks()
         p = mp.Pool(cores)
