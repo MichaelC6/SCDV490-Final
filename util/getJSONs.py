@@ -9,6 +9,7 @@ from util.xmlTools import *
 import numpy as np
 import itertools
 import gc
+import json
     
 def writeXML(args):
     section, outfile = args
@@ -142,15 +143,17 @@ if __name__ == '__main__':
         # del args
         # gc.collect()
 
-        chunkXML(filePath)
-        file = None
-        cores = mp.cpu_count() - 1
-        allChunks = getAllChunks()
-        p = mp.Pool(cores)
-        out = p.map(readXMLChunk, allChunks)
-        ret = pd.concat(out)
-        ret.reset_index(inplace=True)
-        p.close()
+        # chunkXML(filePath)
+        # file = None
+        # cores = mp.cpu_count() - 1
+        # allChunks = getAllChunks()
+        # p = mp.Pool(cores)
+        # out = p.map(readXMLChunk, allChunks)
+        # ret = pd.concat(out)
+        # ret.reset_index(inplace=True)
+        # p.close()
+
+        ret = readXMLChunk(filePath)
 
         ret['hasAmenity'] = ['amenity' in row.tagKeys for ii,row in ret.iterrows()]
     
@@ -160,10 +163,10 @@ if __name__ == '__main__':
         ret.to_json(jsonFilePath)
         print("Finished Processing")
 
-        for c in allChunks:
-            os.remove(c)
-        os.rmdir(os.path.join(dataFolder, 'temp'))
-        print("Deleted Temp")
+        # for c in allChunks:
+        #     os.remove(c)
+        # os.rmdir(os.path.join(dataFolder, 'temp'))
+        # print("Deleted Temp")
 
         endTime = time.time()
         totalTime = endTime - startTime

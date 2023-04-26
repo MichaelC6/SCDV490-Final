@@ -95,7 +95,7 @@ def readXMLChunk(path):
     file : open file object
     '''
     global chunkFile
-    chunkFile = open(path, encoding='UTF-8',).readlines()
+    chunkFile = open(path, encoding='UTF-8',).readlines()[3:]
 
     df = {'type': [],'id': [],'lat': [],'long': [],'tagKeys': [], 'tagVals': [] }
     
