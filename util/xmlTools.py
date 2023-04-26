@@ -2,7 +2,7 @@ import re
 import pandas as pd
 import gc
 
-file = None
+chunkFile = None
 
 #This is a quick function to append a multi-output function
 #To different lists at once
@@ -46,26 +46,26 @@ def readTag(line):
 
 #This goes in tandem with readTags so that it can do multiple lines
 def readAllTags(index):
-    global file
+    global chunkFile
     #Makes the two empty lists
     keys = []
     values = []
     tagsDone = False
     #While there is still lines to process afterwards...
-    while index+1 < len(file) and not tagsDone:
-
+    while index+1 < len(chunkFile) and not tagsDone:
         #If the next line is </node> run this and break
-        if '</node>' in file[index + 1]:
+        if '</node>' in chunkFile[index + 1]:
             #print(file[index])
-            nAppend([keys,values],readTag(file[index]))
+            nAppend([keys,values],readTag(chunkFile[index]))
             index += 1
             tagsDone = True
 
         #Otherwise just keep running and return a list
         else:
-            nAppend([keys,values],readTag(file[index]))
+            nAppend([keys,values],readTag(chunkFile[index]))
             index += 1
-    return keys,values,index
+        
+        return keys,values,index
 
 #This function gets the type of line
 #Returns node, tag, way, end of tag, relation
@@ -94,18 +94,18 @@ def readXMLChunk(path):
 
     file : open file object
     '''
-
-    file = open(path, encoding='UTF-8',).readlines()
+    global chunkFile
+    chunkFile = open(path, encoding='UTF-8',).readlines()
 
     df = {'type': [],'id': [],'lat': [],'long': [],'tagKeys': [], 'tagVals': [] }
     
     #To avoid being above n time complexity, have to be a bit creative here.
     index = 0
     nNodes = 0
-    while index < len(file):
+    while index < len(chunkFile):
         #print(f"CURRENT INDEX: {index}")
         #Starts by getting the current line
-        line = file[index]
+        line = chunkFile[index]
 
         #Then it gets the type of the current line
         type = getType(line)
@@ -119,13 +119,17 @@ def readXMLChunk(path):
                 #print(line)
                 continue
         #Then if the next row is a tag
-            if index + 1 < len(file) - 1 and getType(file[index+1]) == 'tag':
+            if index + 1 < len(chunkFile) - 1 and getType(chunkFile[index+1]) == 'tag':
                 #print("IN A TAG!")
                 #Go to the next row and get the line
                 index += 1
-                line = file[index]
+                line = chunkFile[index]
                 #Use the readAllTags function
-                keys,values,newIndex = readAllTags(index)
+                try:
+                    keys,values,newIndex = readAllTags(index)
+                except TypeError:
+                    Testing = readAllTags(index)
+                    print(Testing)
                 #And return the tag type
                 if len(keys) != len(values):
                     raise Exception('number of keys and values is different!')
@@ -149,8 +153,8 @@ def readXMLChunk(path):
         else:
             index += 1
         if index % 1000000 == 0:
-            print(f"The index is currently {index} out of {len(file)}")
-    del file
+            print(f"The index is currently {index} out of {len(chunkFile)}")
+
     gc.collect()
     #print(df.keys())
     #Checking time of running

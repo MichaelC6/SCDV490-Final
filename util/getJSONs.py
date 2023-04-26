@@ -13,7 +13,10 @@ import gc
 def writeXML(args):
     section, outfile = args
     file = open(outfile, 'w', encoding='utf-8')
+    file.write("<?xml version='1.0' encoding='UTF-8'?>\n")
+    file.write("<osm version=\"0.6\" generator=\"osmium/1.14.0\">\n")
     file.writelines(section)
+    file.write("</osm>\n")
     file.close()
     del file
     gc.collect()
@@ -29,13 +32,13 @@ def getAllChunks():
 
 def chunkXML(path):
     #Opens the file from the path
-    file = open(path).readlines()[3:]
+    file = open(path, encoding='utf-8').readlines()[3:]
 
-    cores = 5
+    cores = mp.cpu_count()
 
-    numFiles = mp.cpu_count() - 1
+    numFiles = cores - 1
 
-    indicies = np.linspace(3,len(file)-1,numFiles+1, dtype=int)
+    indicies = np.linspace(0,len(file)-1,numFiles+1, dtype=int)
 
     newPath = os.path.join(os.getcwd(), "data", "osm", "temp")
 
@@ -57,43 +60,35 @@ def chunkXML(path):
             endline = file[indicies[i + 1]]
 
     # once indicies are adjusted we no longer need the file and can kill it 
-    del file
-    gc.collect()
-
-    file = open(path)
-    sectionIndex = 0
     files = []
-    barriers = list(zip(indicies[:-1], indicies[1:]))
-    lastBarrier = len(barriers) - 1
-    sections = [[]] * numFiles
-    index = 3
-    bBar,eBar = barriers[sectionIndex]
-    for line in file:
-        if index >= bBar and index < eBar:
-            sections[sectionIndex].append(line)
-            index += 1
-        else:
-            if index == barriers[lastBarrier][1]:
-                sections[-1].append(line)
-                files.append(os.path.join(newPath, str(bBar) + "-" + str(eBar) + ".osm"))
-            else:
-                #print(f"SINDEX: {sectionIndex} OUT OF {len(barriers)-1}")
-                #print(f"THE INDEX IS {index} out of {barriers[lastBarrier]}")
-                files.append(os.path.join(newPath, str(bBar) + "-" + str(eBar) + ".osm"))
-                sectionIndex += 1
-                bBar,eBar = barriers[sectionIndex]
-                sections[sectionIndex].append(line)
-                index += 1
+
+    for i,j in zip(indicies[:-1], indicies[1:]):
+        files.append(os.path.join(os.getcwd(),"data","osm","temp",f"{i}-{j}.osm"))
     
-    file.close()
+
+    sNum = 0    
+    temp = open(files[sNum], 'w', encoding='utf-8')
+    for index,line in enumerate(file):
+        if index >= indicies[sNum] and index < indicies[sNum + 1]:
+            temp.write(line)
+        else:
+            if index == len(file)-1:
+                temp.write(line)
+                temp.close()
+                del temp
+                gc.collect()
+            else:
+                temp.close()
+                del temp
+                gc.collect()
+                sNum += 1
+                temp = open(files[sNum], 'w', encoding='utf-8')
+                temp.write(line)
+
     del file
     gc.collect()
 
-    print("got each file indicies")
-
-    #Now we need to export each file    
-
-    return list(zip(sections,files))
+    print("got each file indicies and have written to temp")
 
 if __name__ == '__main__':
 
@@ -135,17 +130,21 @@ if __name__ == '__main__':
     
         filePath = os.path.join(dataFolder, filename)
         
-        args = chunkXML(filePath)
-        cores = mp.cpu_count() - 1
-        for arg in args:
-            writeXML(arg)
-        # with mp.Pool(cores) as p:
-        #     p.map(writeXML, args) 
-        #     p.close()
-        print("Finished Splitting")
-        del args
-        gc.collect()
+        # args = chunkXML(filePath)
+        # print(f"The Length of section: {len(args[0][0])}")
+        # print(f"The Length of section: {len(args[1][0])}")
+        # print(f"The Length of section: {len(args[-1][0])}")
+        # cores = mp.cpu_count() - 1
+        # for arg in args:
+        #     writeXML(arg)
+            
+        # print("Finished Splitting")
+        # del args
+        # gc.collect()
 
+        chunkXML(filePath)
+        file = None
+        cores = mp.cpu_count() - 1
         allChunks = getAllChunks()
         p = mp.Pool(cores)
         out = p.map(readXMLChunk, allChunks)
