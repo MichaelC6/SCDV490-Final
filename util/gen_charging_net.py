@@ -2,7 +2,7 @@
 Class to hold software for the search algorithm. First attempt is DF
 '''
 import os, time
-from multiprocessing import Pool, cpu_count
+#from multiprocessing import Pool, cpu_count
 from mapFunctions import *
 import numpy as np
 import pandas as pd
@@ -36,12 +36,7 @@ class GenerateChargingNetwork():
         '''
         self._gridData()
 
-        if mp > 1:
-            with Pool(mp) as p:
-                mapOutput = p.map(self._searchInBox, [*self.grid])
-
-        else:
-            mapOutput = map(self._searchInBox, [*self.grid])
+        mapOutput = map(self._searchInBox, [*self.grid])
 
         out = list(mapOutput)
             
