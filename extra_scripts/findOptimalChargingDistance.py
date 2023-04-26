@@ -13,7 +13,7 @@ plt.style.use(os.path.join(os.getcwd(), 'charging-network.mplstyle'))
 
 # read in and clean the data
 # this data is from https://afdc.energy.gov/data/10963
-dir = os.path.join(os.getcwd(), 'sampleData')
+dir = os.path.join(os.getcwd(), 'data', 'oldFiles')
 filepath = os.path.join(dir, 'EV_range_efficiency.csv')
 ranges = pd.read_csv(filepath, skiprows=2)
 
