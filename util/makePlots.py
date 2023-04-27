@@ -1,5 +1,6 @@
 '''
-Generates a bunch of interesting plots for our analysis
+Generates a bunch of interesting plots for our analysis to check
+the success of our code
 '''
 import os
 import pickle
@@ -15,11 +16,12 @@ def io(csvPath, pklPath):
     '''
     Reads in the given output csv file and pickle file
     '''
-    csv = pd.read_csv(csvPath)
+    csv = pd.read_csv(csvPath) # read in the csv file for a state
 
-    with open(pklPath, 'rb') as f:
+    with open(pklPath, 'rb') as f: # read in the pickle files
         data = np.array(pickle.load(f), dtype=object)
 
+    # unpack the pickle data
     centers = np.array([np.array(d) for d in data[:,0]])
     nodes = data[:,1]
 
@@ -31,9 +33,13 @@ def distanceDifference(df):
     '''
     minSep = []
     for ii,row in df.iterrows():
+        # compute distance
         separations = geodesicDist(row.lat, row.long, np.array(df.lat), np.array(df.long))
         goodSeps = separations[separations > 0]
+
+        # calculate the minimum separation
         minSep.append(min(separations))
+        
     return np.array(minSep)
 
 def plotMinDist(sep, outdir):
@@ -52,6 +58,7 @@ def plotHeatMap(n, centers, outpath, fig=None, **kwargs):
     Plots a heat map given nodes and centers
     '''
 
+    # unpack lat and long from centers
     lat = centers[:,0]
     long = centers[:,1]
     
@@ -59,6 +66,8 @@ def plotHeatMap(n, centers, outpath, fig=None, **kwargs):
         fig, ax = plt.subplots()
     else:
         ax = fig.get_axes()[0]
+    
+    # generate a scatter plot and color by number of chargers
     im = ax.scatter(long, lat, c=n, norm=LogNorm(), **kwargs)
     fig.colorbar(im, label='Number of Chargering Sites')
     ax.set_ylabel('Latitude [deg]')
@@ -71,6 +80,7 @@ def main():
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
+    # define all the state names for reading
     allStates = ["alabama","arizona","arkansas","california","colorado","connecticut","delaware",
                  "district-of-columbia","florida","georgia","idaho","illinois","indiana","iowa",
                  "kansas","kentucky","louisiana","maine","maryland","massachusetts","michigan","minnesota",
@@ -84,17 +94,21 @@ def main():
     centersPerState = []
     for state in allStates:
 
+        # grab the correct paths for the csv and pickle files
         csvPath = os.path.join(os.getcwd(), 'data', 'csvs', f'{state}-out.csv')
         pklPath  = os.path.join(os.getcwd(), 'data', 'pickle', f'{state}-out.pkl')
 
         if not os.path.exists(csvPath) or not os.path.exists(pklPath):
             print(f'WARNING! Skipping {state} because the input files do not exist') 
             continue
-            
+
+        # read in the state data
         csv, nodes, centers = io(csvPath, pklPath)
-        
+
+        # calculate the minimum separation
         minSeps.append(distanceDifference(csv))
 
+        # compute zoom in heatmaps for a select number of states
         if state in ['new-york', 'california', 'minnesota', 'rhode-island']:
             n = [len(row) for row in nodes]
             plotHeatMap(n, centers, os.path.join(outdir, state+'-heatmap.png'), s=25)
@@ -107,6 +121,7 @@ def main():
         centerLong = np.sort(centers[:,1])[midIdx]
         centersPerState.append([centerLat, centerLong])
 
+    # generate a heatmap for the entire US
     seps = np.concatenate(minSeps)
     plotMinDist(seps, outdir)
 

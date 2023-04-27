@@ -10,18 +10,24 @@ from gen_charging_net import GenerateChargingNetwork
 import pandas as pd
 
 def getStateChargingNetwork(f, verbose=False):
+    '''
+    Get the charging network for a given state file
+    '''
 
+    # call the GenerateChargingNetwork software with the given file
     s = GenerateChargingNetwork(f)
 
     if verbose:
         print('json file data:')
         print(s.data)
-    
+
+    # generate the charging network now
     goodNodes = s.genChargingNetwork()
 
     # write goodNodes to a pickle file
     out = list(zip(s.gridCoordCenters.values(), goodNodes))
 
+    # define some file paths
     outpkl = os.path.split(f)[-1].replace('-latest.json', '-out.pkl')
     outcsv = os.path.split(f)[-1].replace('-latest.json', '-out.csv')
     outdirpkl = os.path.dirname(f).replace('jsons', 'pickle')
@@ -31,6 +37,7 @@ def getStateChargingNetwork(f, verbose=False):
     if not os.path.exists(outdircsv):
         os.makedirs(outdircsv)
 
+    # write out the pickle file with grid information
     outpath = os.path.join(outdirpkl, outpkl)
     with open(outpath, 'wb') as f:
         pickle.dump(out, f, pickle.HIGHEST_PROTOCOL)
@@ -42,6 +49,7 @@ def getStateChargingNetwork(f, verbose=False):
 
 def main():
 
+    # time it
     start = time.time()
     
     import argparse
@@ -56,6 +64,7 @@ def main():
         infiledir = os.path.dirname(args.infile)
         filenames = [args.infile]
 
+    # loop over all the JSON files (for each state)
     for filename in filenames:
         getStateChargingNetwork(filename)
 
