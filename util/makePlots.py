@@ -60,7 +60,7 @@ def plotHeatMap(n, centers, outpath, fig=None, **kwargs):
     else:
         ax = fig.get_axes()[0]
     im = ax.scatter(long, lat, c=n, norm=LogNorm(), **kwargs)
-    fig.colorbar(im, label='Number of Chargers')
+    fig.colorbar(im, label='Number of Chargering Sites')
     ax.set_ylabel('Latitude [deg]')
     ax.set_xlabel('Longitude [deg]')
     fig.savefig(outpath)

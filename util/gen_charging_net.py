@@ -2,7 +2,6 @@
 Class to hold software for the search algorithm. First attempt is DF
 '''
 import os, time
-#from multiprocessing import Pool, cpu_count
 from mapFunctions import *
 import numpy as np
 import pandas as pd
@@ -26,16 +25,17 @@ class GenerateChargingNetwork():
         else:
             raise IOError('Please run getAllData before starting to generate the charging network')
             
-        self.goodLocs = []
-        self.grid = None
-        self.gridCoordCenters = None
+        self.grid = None # the data after being split into a grid
+        self.gridCoordCenters = None # the centers of each grid location for analysis later
 
-    def genChargingNetwork(self, mp=cpu_count()-1):
+    def genChargingNetwork(self):
         '''
         Create and return the locations of the nodes in the charging network
         '''
         self._gridData()
 
+        # generate the charging network by looping over self.grid
+        # "map" loops overself.grid
         mapOutput = map(self._searchInBox, [*self.grid])
 
         out = list(mapOutput)
@@ -60,6 +60,7 @@ class GenerateChargingNetwork():
         if len(boxVals) == 0:
             return pd.DataFrame({})
 
+        # number of chargers per grid box
         n = int(np.ceil(len(boxVals)*percent))
         idxs = np.arange(0, len(boxVals), 1, dtype=int)
 
@@ -72,6 +73,7 @@ class GenerateChargingNetwork():
         '''
         Gets the relevant rows from self.data for the search
         '''
+        # clean up the data and only get things that are amenities
         self.data = self.data[self.data.hasAmenity == True].reset_index(drop=True)  
         print(self.data)
 
@@ -83,7 +85,7 @@ class GenerateChargingNetwork():
         returns: dictionary where keys are the tile number
         '''
 
-        self._getRelevantNodes()
+        self._getRelevantNodes() # get amenities
 
         gridCoords = {}
         grid = {}
@@ -104,6 +106,7 @@ class GenerateChargingNetwork():
         print(f'top left corner: {topLeft}')
         print(f'top right corner: {topRight}')
 
+        # calculate the total map dimensions for the state
         mapWidth = geodesicDist(bottomLeft[0], bottomLeft[1], bottomRight[0], bottomRight[1])
         mapHeight = geodesicDist(bottomLeft[0], bottomLeft[1], topLeft[0], topLeft[1])
         
@@ -116,19 +119,23 @@ class GenerateChargingNetwork():
                 dist = geodesicDist(currLat, currLong, np.array(self.data.lat), np.array(self.data.long))
                 inGrid = np.where(dist < tileWidth)[0]
 
+                # add this data to the grid
                 grid[ii] = self.data.iloc[inGrid]
                 gridCoords[ii] = [coordFromRadialDist(currLat, currLong, tileWidth/2, lon2=currLong),
                                   coordFromRadialDist(currLat, currLong, tileWidth/2, lat2=currLat)]
-                
+
+                # recalculate the current latitude
                 currHeight += tileWidth
                 currLat = coordFromRadialDist(currLat, currLong, tileWidth, lon2=currLong)
 
                 ii += 1
-                
+
+            # update the current width
             currWidth += tileWidth
             currLong = coordFromRadialDist(currLat, currLong, tileWidth, lat2=currLat)
             currLat = origCurrLat
 
+        # assign grid to instance variable
         self.grid = grid
         self.gridCoordCenters = gridCoords
         
