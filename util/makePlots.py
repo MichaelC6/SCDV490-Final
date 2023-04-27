@@ -47,16 +47,19 @@ def plotMinDist(sep, outdir):
     ax.set_yscale('log')
     fig.savefig(os.path.join(outdir, 'min-sep-hist.png'))
 
-def plotHeatMap(n, centers, outpath, **kwargs):
+def plotHeatMap(n, centers, outpath, fig=None, **kwargs):
     '''
     Plots a heat map given nodes and centers
     '''
 
     lat = centers[:,0]
     long = centers[:,1]
-
-    fig, ax = plt.subplots()
-    im = ax.scatter(long, lat, c=n, marker='s', cmap='copper', norm=LogNorm())
+    
+    if fig is None:
+        fig, ax = plt.subplots()
+    else:
+        ax = fig.get_axes()[0]
+    im = ax.scatter(long, lat, c=n, norm=LogNorm(), **kwargs)
     fig.colorbar(im, label='Number of Chargers')
     ax.set_ylabel('Latitude [deg]')
     ax.set_xlabel('Longitude [deg]')
