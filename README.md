@@ -28,11 +28,17 @@ you will be running this code.
     * For VSCode reference [this link](https://code.visualstudio.com/docs/python/environments)
 
 ## Running the Project Code
+
+NOTE: This project data takes approximately 350.76 GB of storage.
+
 To run the project code simply execute the following command from your
 favorite terminal: `./run.sh`. Note: this will take a very long time (even though it
-is very optimized)
+is very optimized). NOTE: Do not run on linux unless you have over 150 GBs of ram.
+Mac OS does run this due to it's memory management, your mileage on Windows but expect errors.
 
 On the other hand, you can run the analysis for a certain state by doing
 `./run-state.sh state-name` where state-name should be replaced by a state name
-that is all lower case and spaces are separated by a -. For example, New York
-would be `./run-state.sh new-york`.
+that is all lower case and spaces are separated by a -. We recommend only running on small states.
+For example, Rhode Island would be `./run-state.sh rhode-island`. This is a memory and storage smart script (for small states!).
+
+Other small states include the following: `district-of-columbia`, `deleware`, `vermont`, `south-dakota`, `new-hampshire`

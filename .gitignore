@@ -9,3 +9,4 @@ logs/*
 *.osm
 *.bz2
 data/*
+.DS_Store
