@@ -32,8 +32,9 @@ On the other hand, you can run the analysis for a certain state by doing
 that is all lower case and spaces are separated by a -. We recommend only running on small states.
 For example, Rhode Island would be `./run-state.sh rhode-island`. This is a memory and storage smart script (for small states!).
 Other small states include the following: `district-of-columbia`, `deleware`, `vermont`, `south-dakota`, `new-hampshire`. This
-pipeline will run on Linux (tested with Ubuntu 20.04) and MacOS as is. To run on Windows, you will need
-to make the modifications described in the paragraph above. **This is the recommended approach!!**
+pipeline will run on Linux (tested with Ubuntu 20.04) and MacOS as is. **This is the recommended approach!!**
+* NOTE: To run on Windows, you will need to comment out the first line of the `./run-state.sh` pipeline script
+and unzip the bzip2 files by hand.
 
 To run the entire project code (the whole United States) simply execute the following command from your
 favorite terminal: `./run.sh`.
